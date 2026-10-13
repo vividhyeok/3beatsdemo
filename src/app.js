@@ -4,6 +4,15 @@ import {chooseAI} from "./ai.js";
 let selection={player:"jack",enemy:"eve",difficulty:"normal"};
 let match=newGame(selection.player,selection.enemy),view=match,queue=[],pending=null,preview=null,playing=false,sound=true;
 const $=sel=>document.querySelector(sel);
+const IMAGE_PATHS={
+ forward:"common/forward",back:"common/back",up:"common/up",down:"common/down",guard:"common/guard",focus:"common/focus",
+ jack_jab:"jack/jab",jack_dash:"jack/dash",jack_slam:"jack/slam",jack_spin:"jack/spin",jack_ult:"jack/ult",
+ eve_aim:"eve/aim",eve_pierce:"eve/pierce",eve_retreat:"eve/retreat",eve_cross:"eve/cross",eve_ult:"eve/ult",
+ raven_jab:"raven/jab",raven_push:"raven/push",raven_trap:"raven/trap",raven_ward:"raven/ward",raven_ult:"raven/ult",
+ zeta_jab:"zeta/jab",zeta_slide:"zeta/slide",zeta_long:"zeta/long",zeta_brake:"zeta/brake",zeta_ult:"zeta/ult"
+};
+function imageFor(id){return "assets/cards/"+IMAGE_PATHS[id]+".webp";}
+
 const escapeHtml=x=>String(x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function who(i){return CHARACTERS[view.fighters[i].character];}
 function playSound(kind="tap"){
@@ -81,8 +90,8 @@ function renderBoard(){
   html+='<button class="tile '+(hit?"preview-"+hit:"")+(canTarget?" can-target":"")+'" data-tile="'+x+','+y+'" aria-label="좌표 '+(x+1)+','+(y+1)+'"><span class="tile-label">'+(x+1)+'·'+(y+1)+'</span>'+
     ((x===1||x===2)&&y===1?'<span class="center-mark">◈</span>':"")+
     (trap?'<span class="trap-mark" title="설치된 함정">⌗</span>':"")+
-    (hasPlayer?'<span class="unit player-unit" style="--unit:'+who(0).color+'"><span>'+escapeHtml(who(0).symbol)+'</span><small>YOU</small></span>':"")+
-    (hasEnemy?'<span class="unit enemy-unit" style="--unit:'+who(1).color+'"><span>'+escapeHtml(who(1).symbol)+'</span><small>CPU</small></span>':"")+
+    (hasPlayer?'<span class="unit player-unit" style="--unit:'+who(0).color+'"><img class="unit-sprite" src="'+who(0).portrait+'" alt=""><small>YOU</small></span>':"")+
+    (hasEnemy?'<span class="unit enemy-unit" style="--unit:'+who(1).color+'"><img class="unit-sprite" src="'+who(1).portrait+'" alt=""><small>CPU</small></span>':"")+
     (canTarget?'<span class="target-cross">+</span>':"")+'</button>';
  }
  $("#board").innerHTML=html;
@@ -93,9 +102,13 @@ function cardHTML(c){
  const active=pending?.id===c.id,queued=queue.some(a=>a.id===c.id)&&!c.repeat;
  const available=!queued&&queue.length<3&&!playing&&view.status!=="finished";
  const isCommon=COMMON.includes(c);
- const dmg=c.damage?'<span class="damage-label">DMG <b>'+c.damage+'</b> / '+c.glance+'</span>':'<span class="damage-label">'+(c.kind==="defense"?"GUARD":c.kind==="energy"?"RECOVER":"MOVE")+'</span>';
- return '<button class="skill-card '+(isCommon?"shared":"unique")+" "+(active?"active":"")+'" data-card="'+c.id+'" '+(!available?'disabled':"")+' title="'+escapeHtml(c.description)+'"><div class="card-art"><span class="card-sigil">'+escapeHtml(c.icon)+'</span><span class="art-geometry"></span></div><div class="card-bottom"><div class="card-title">'+c.name+'</div><span class="en-label">'+(c.cost?c.cost+' EN':"0 EN")+'</span>'+dmg+'<p>'+escapeHtml(c.description)+'</p></div></button>';
+ const dmg=c.damage?'<span class="damage-label">DM <b>'+c.damage+'</b> · GR '+c.glance+'</span>':'<span class="damage-label">'+(c.kind==="defense"?"GUARD":c.kind==="energy"?"RECOVER":"MOVE")+'</span>';
+ const image=imageFor(c.id);
+ return '<button class="skill-card '+(isCommon?"shared":"unique")+" "+(active?"active":"")+'" data-card="'+c.id+'" '+(!available?'disabled':"")+' title="'+escapeHtml(c.description)+'">'+
+ '<div class="card-art"><img class="card-illustration" alt="" loading="lazy" src="'+image+'" onerror="this.hidden=true;this.parentNode.classList.add(\'image-missing\')"><span class="card-sigil">'+escapeHtml(c.icon)+'</span></div>'+
+ '<div class="card-bottom"><div class="card-title">'+c.name+'</div><span class="en-label">'+c.cost+' EN</span>'+dmg+'<p>'+escapeHtml(c.description)+'</p></div></button>';
 }
+
 function renderCards(){
  const character=match.fighters[0].character;
  $("#common-cards").innerHTML=COMMON.map(cardHTML).join("");
@@ -103,7 +116,7 @@ function renderCards(){
  $("#unique-heading").textContent=CHARACTERS[character].name+' / 고유 기술';
  $("#queue").innerHTML=Array.from({length:3},(_,i)=>{
   const a=queue[i],c=a&&CARD_MAP[a.id],detail=a&&(a.direction?' / '+(a.direction==="up"?"↑":a.direction==="down"?"↓":a.direction==="forward"?"→":"←"):a.target?' / '+(a.target.x+1)+','+(a.target.y+1):'');
-  return '<button class="queue-slot '+(a?"filled":"")+'" data-remove="'+i+'" '+(playing?'disabled':"")+'><small>BEAT '+(i+1)+'</small>'+(c?'<span>'+c.icon+' '+c.name+'</span><em>'+detail+'　×</em>':'<span>+ 카드 선택</span>')+'</button>';
+  return '<button class="queue-slot '+(a?"filled":"")+'" data-remove="'+i+'" '+(playing?'disabled':"")+'><small>BEAT '+(i+1)+'</small>'+(c?'<span class="queue-card"><img src="'+imageFor(c.id)+'" alt="" onerror="this.hidden=true"><strong>'+c.name+'</strong></span><em>'+detail+'　×</em>':'<span>+ 카드 선택</span>')+'</button>';
  }).join("");
  $("#queue-count").textContent=queue.length+"/3";
  $("#projected-en").textContent="예약 후 예상 EN "+projectedEN()+" / 100";

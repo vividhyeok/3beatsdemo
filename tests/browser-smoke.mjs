@@ -6,7 +6,9 @@ import os from "node:os";
 import {spawn,spawnSync} from "node:child_process";
 import {setTimeout as delay} from "node:timers/promises";
 const root=process.cwd(),mime={".html":"text/html",".js":"text/javascript",".css":"text/css",".svg":"image/svg+xml",".png":"image/png"};
-const browser=["google-chrome","chromium","chromium-browser"].find(n=>spawnSync("which",[n]).status===0);
+const browser=process.platform==="win32"
+ ? [process.env.PROGRAMFILES+"/Google/Chrome/Application/chrome.exe",process.env["PROGRAMFILES(X86)"]+"/Microsoft/Edge/Application/msedge.exe"].find(n=>fs.existsSync(n))
+ : ["google-chrome","chromium","chromium-browser"].find(n=>spawnSync("which",[n]).status===0);
 if(!browser)throw Error("Chromium is required for browser smoke test");
 const server=http.createServer((req,res)=>{
  let rel=decodeURIComponent((req.url||"/").split("?")[0]);if(rel==="/")rel="/index.html";
@@ -20,7 +22,7 @@ await new Promise(resolve=>server.listen(0,"127.0.0.1",resolve));
 const pageUrl="http://127.0.0.1:"+server.address().port+"/";
 try{
  const profile=fs.mkdtempSync(path.join(os.tmpdir(),"three-beats-chrome-"));
- chrome=spawn(browser,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--no-first-run","--no-default-browser-check","--remote-debugging-port="+port,"--user-data-dir="+profile,"about:blank"],{stdio:"ignore"});
+ chrome=spawn(browser,["--headless=new","--window-size=1440,1080","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--no-first-run","--no-default-browser-check","--remote-debugging-port="+port,"--user-data-dir="+profile,"about:blank"],{stdio:"ignore"});
  let target;
  for(let i=0;i<60;i++){
   try{const tabs=await (await fetch("http://127.0.0.1:"+port+"/json")).json();target=tabs.find(t=>t.type==="page");if(target)break;}catch{}
@@ -52,6 +54,8 @@ try{
   await delay(120);
  }
  if(!ready)throw Error("UI did not render cards and board");
+ const images=await evaluate("Promise.all([...document.images].map(img=>img.decode().then(()=>true,()=>false)))");
+ if(images.some(loaded=>!loaded))throw Error("An illustration failed to load");
  const initial=await evaluate("({cards:document.querySelectorAll('[data-card]').length,tiles:document.querySelectorAll('[data-tile]').length,enemy:document.querySelector('#enemy-name').textContent})");
  console.log("Rendered UI:",JSON.stringify(initial));
  await evaluate("document.querySelector('[data-card=\"forward\"]').click();document.querySelector('[data-card=\"jack_jab\"]').click();document.querySelector('[data-card=\"focus\"]').click()");

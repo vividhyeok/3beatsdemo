@@ -4,14 +4,7 @@ import {chooseAI} from "./ai.js";
 let selection={player:"jack",enemy:"eve",difficulty:"normal"};
 let match=newGame(selection.player,selection.enemy),view=match,queue=[],pending=null,preview=null,playing=false,sound=true,revealed=[],enemyPlan=[],playerPlan=[],runToken=0;
 const $=sel=>document.querySelector(sel);
-const IMAGE_PATHS={
- forward:"common/forward",back:"common/back",up:"common/up",down:"common/down",guard:"common/guard",focus:"common/focus",
- jack_jab:"jack/jab",jack_dash:"jack/dash",jack_slam:"jack/slam",jack_spin:"jack/spin",jack_ult:"jack/ult",
- eve_aim:"eve/aim",eve_pierce:"eve/pierce",eve_retreat:"eve/retreat",eve_cross:"eve/cross",eve_ult:"eve/ult",
- raven_jab:"raven/jab",raven_push:"raven/push",raven_trap:"raven/trap",raven_ward:"raven/ward",raven_ult:"raven/ult",
- zeta_jab:"zeta/jab",zeta_slide:"zeta/slide",zeta_long:"zeta/long",zeta_brake:"zeta/brake",zeta_ult:"zeta/ult"
-};
-function imageFor(id){return "assets/cards/"+id+".svg";}
+function imageFor(id){return "assets/cards/"+id+".png";}
 
 const escapeHtml=x=>String(x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function who(i){return CHARACTERS[view.fighters[i].character];}
@@ -137,7 +130,7 @@ function renderCards(){
 function revealCard(id,idx,faceDown,flipping){
  const c=id&&CARD_MAP[id];
  const label="BEAT "+(idx+1);
- const back='assets/cards/card_back.svg';
+ const back='assets/cards/card_back.png';
  if(faceDown)return '<div class="reveal-card facedown" data-beat="'+idx+'"><img src="'+back+'" alt="비공개 카드 뒷면"><span>'+label+'</span></div>';
  if(!c)return '<div class="reveal-card empty" data-beat="'+idx+'"><span>'+label+'</span><strong>?</strong></div>';
  return '<div class="reveal-card open '+(flipping?'flip':'')+'" data-beat="'+idx+'"><img src="'+imageFor(id)+'" alt="" onerror="this.hidden=true"><div class="reveal-card-text"><b>'+escapeHtml(c.name)+'</b><small>EN '+c.cost+' · DM '+c.damage+'</small></div><span>'+label+'</span></div>';
@@ -145,7 +138,7 @@ function revealCard(id,idx,faceDown,flipping){
 function renderReveal(){
  const player=$("#player-reveal"),enemy=$("#enemy-reveal"),msg=$("#reveal-message");
  if(!player||!enemy)return;
- player.innerHTML=Array.from({length:3},(_,i)=>revealCard((playing?playerPlan:queue)[i]?.id,i,false,playing&&revealed.length===i+1)).join("");
+ player.innerHTML=Array.from({length:3},(_,i)=>revealCard((playing||enemyPlan.length?playerPlan:queue)[i]?.id,i,false,playing&&revealed.length===i+1)).join("");
  enemy.innerHTML=Array.from({length:3},(_,i)=>revealCard(enemyPlan[i]?.id,i,enemyPlan.length===0||!revealed.includes(i),playing&&revealed[revealed.length-1]===i)).join("");
  msg.textContent=playing?'BEAT '+(revealed.length||1)+' / 3 · 카드 공개 중':enemyPlan.length?'라운드 결과 · 상대의 선택을 확인하세요':'CPU의 행동은 실행될 때까지 비공개입니다';
 }
@@ -179,7 +172,8 @@ async function execute(){
   await new Promise(ok=>setTimeout(ok,850));
   if(thisRun!==runToken)return;
   revealed.push(frame.beat-1);renderReveal();
-  view=frame.state;renderHUD();renderBoard();renderLog();
+  const previous=view;
+  view=frame.state;renderHUD();renderBoard();renderLog();animateBeat(frame,previous);
   if(frame.events.some(e=>e.type==="hit"&&e.amount>0))playSound("hit");else playSound("tap");
  }
  await new Promise(ok=>setTimeout(ok,450));
@@ -187,6 +181,28 @@ async function execute(){
  match=round.state;view=match;queue=[];preview=null;pending=null;playing=false;render();
  if(match.status==="finished")toast(match.winner===0?"섹터 승리!":match.winner===1?"패배. 전술을 다시 검토해보세요.":"무승부.");
  else toast("ROUND "+match.round+" · EN 15 회복");
+}
+function animateBeat(frame,previous){
+ const arena=$(".battle-arena");
+ arena.classList.remove("impact");
+ void arena.offsetWidth;
+ const hits=frame.events.filter(e=>e.type==="hit"&&e.amount>0);
+ if(hits.length)arena.classList.add("impact");
+ for(let i=0;i<2;i++){
+  const unit=$(i===0?".player-unit":".enemy-unit");
+  if(!unit)continue;
+  const before=previous.fighters[i],after=view.fighters[i];
+  if(before.x!==after.x||before.y!==after.y)unit.classList.add("moving");
+  const damage=Math.max(0,before.hp-after.hp);
+  if(damage){
+   unit.classList.add("damaged");
+   const number=document.createElement("span");number.className="damage-float";number.textContent="?"+damage;unit.append(number);
+  }
+  if(frame.events.some(e=>e.type==="guard"&&e.side===i)){
+   const shield=document.createElement("span");shield.className="guard-flash";shield.textContent="GUARD";unit.append(shield);
+  }
+ }
+ $("#beat-counter").textContent="BEAT "+frame.beat+" / 3";
 }
 function showHelp(){
  $("#help").showModal();

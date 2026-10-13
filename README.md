@@ -55,3 +55,9 @@ For balancing, record side, character matchup, outcome, HP, and unexpected tacti
 The game UI supports image artwork for all 26 unique card IDs using `assets/cards/<character>/<shortname>.webp` and one common card back. Asset names are defined in `src/app.js`. The illustration pack is supplied separately as `three_beats_cards_all_26_ui_assets.zip`; copy the `assets/cards/` folder from that archive to the matching repository directory before packaging a public demo. Card numerical descriptions and hit logic are always derived from `src/game.js`, not the pre-rendered art.
 
 Game-first UI: `index.html` + `game-ui.css`. The previous dashboard remains at `classic.html` for comparison. Do not release the public build before card asset files are installed, and verify the browser smoke test.
+
+## Illustrated combat UI
+
+The 27 supplied PNG illustrations are mapped to the existing card IDs in `assets/cards`, including the secret card back. Desktop presents the shared and fighter decks together; smaller screens keep scrollable card rows. Combat presentation includes HP transitions, movement entrance, actual HP-loss numbers, guard feedback, impact shake, and sequential card reveals. Reduced-motion preferences are respected. Rules, card values, and AI behavior are unchanged.
+
+Run `npm test` for rules and `node tests/browser-smoke.mjs` for a Chromium round smoke test (Chrome or Edge on Windows; Chromium/Chrome on Linux). The smoke test checks image decoding and writes `artifacts/demo-preview.png`.

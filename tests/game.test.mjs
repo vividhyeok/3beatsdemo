@@ -22,13 +22,13 @@ test("3-beat queue validity enforces 1/use and EN limits",()=>{
 });
 test("direct hit, grazing and defense change real HP deterministically",()=>{
  const s=newGame();s.fighters[0].x=1;s.fighters[1].x=2;
- let result=resolveRound(s,[q("jack_jab","focus","guard"),q("focus","focus","guard")]).state;
+ let result=resolveRound(s,[q("jack_jab","focus","guard"),q("focus","guard","back")]).state;
  assert.equal(result.fighters[1].hp,MAX_HP-30);
  const s2=newGame();s2.fighters[0].x=1;s2.fighters[1].x=2;
  result=resolveRound(s2,[q("jack_jab","focus","guard"),q("guard","focus","forward")]).state;
  assert.equal(result.fighters[1].hp,MAX_HP);
  const s3=newGame();s3.fighters[0].x=1;s3.fighters[1].x=2;s3.fighters[1].y=0;
- result=resolveRound(s3,[q("jack_jab","focus","guard"),q("focus","guard","focus")]).state;
+ result=resolveRound(s3,[q("jack_jab","focus","guard"),q("focus","guard","back")]).state;
  assert.equal(result.fighters[1].hp,MAX_HP-15);
 });
 test("simultaneous movement into one square blocks both units",()=>{
@@ -53,7 +53,7 @@ test("special directions and trap square are explicit selectable actions",()=>{
 });
 test("Raven delayed mine explodes on next round beat 2 after movement",()=>{
  const s=newGame("raven","eve");
- const first=resolveRound(s,[[{id:"raven_trap",target:{x:1,y:1}},{id:"focus"},{id:"guard"}],q("focus","guard","focus")]).state;
+ const first=resolveRound(s,[[{id:"raven_trap",target:{x:1,y:1}},{id:"focus"},{id:"guard"}],q("focus","guard","back")]).state;
  assert.ok(first.trap);assert.equal(first.trap.armedRound,2);
  const second=resolveRound(first,[q("guard","focus","up"),q("forward","forward","focus")]);
  assert.equal(second.state.fighters[1].hp,MAX_HP-40);

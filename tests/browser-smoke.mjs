@@ -6,9 +6,9 @@ import os from "node:os";
 import {spawn,spawnSync} from "node:child_process";
 import {setTimeout as delay} from "node:timers/promises";
 const root=process.cwd(),mime={".html":"text/html",".js":"text/javascript",".css":"text/css",".svg":"image/svg+xml",".png":"image/png",".webp":"image/webp",".json":"application/json"};
-const browser=process.platform==="win32"
+const browser=process.env.CHROME_PATH||(process.platform==="win32"
  ? [process.env.PROGRAMFILES+"/Google/Chrome/Application/chrome.exe",process.env["PROGRAMFILES(X86)"]+"/Microsoft/Edge/Application/msedge.exe"].find(n=>fs.existsSync(n))
- : ["google-chrome","chromium","chromium-browser"].find(n=>spawnSync("which",[n]).status===0);
+ : ["google-chrome","chromium","chromium-browser"].find(n=>spawnSync("which",[n]).status===0));
 if(!browser)throw Error("Chromium is required for browser smoke test");
 const server=http.createServer((req,res)=>{
  let rel=decodeURIComponent((req.url||"/").split("?")[0]);if(rel==="/")rel="/index.html";
@@ -18,18 +18,20 @@ const server=http.createServer((req,res)=>{
  fs.readFile(file,(err,bytes)=>{if(err){res.writeHead(404).end();return;}res.writeHead(200,{"Content-Type":mime[path.extname(file)]||"application/octet-stream"});res.end(bytes);});
 });
 let chrome=null,ws=null,profile=null;
-const port=9341;
+let port=0,launchError=null,chromeLog="";
 await new Promise(resolve=>server.listen(0,"127.0.0.1",resolve));
 const pageUrl="http://127.0.0.1:"+server.address().port+"/";
 try{
  profile=fs.mkdtempSync(path.join(os.tmpdir(),"three-beats-chrome-"));
- chrome=spawn(browser,["--headless=new","--window-size=1440,1080","--no-sandbox","--disable-gpu","--disable-background-networking","--disk-cache-size=10485760","--media-cache-size=10485760","--disable-dev-shm-usage","--no-first-run","--no-default-browser-check","--remote-debugging-port="+port,"--user-data-dir="+profile,"about:blank"],{stdio:"ignore"});
+ chrome=spawn(browser,["--headless=new","--window-size=1440,1080","--no-sandbox","--disable-gpu","--disable-background-networking","--disk-cache-size=10485760","--media-cache-size=10485760","--disable-dev-shm-usage","--no-first-run","--no-default-browser-check","--remote-debugging-port=0","--user-data-dir="+profile,"about:blank"],{stdio:["ignore","ignore","pipe"]});
+ chrome.stderr.on("data",chunk=>{chromeLog=(chromeLog+chunk.toString()).slice(-8000);});chrome.on("error",error=>{launchError=error;});
  let target;
- for(let i=0;i<60;i++){
-  try{const tabs=await (await fetch("http://127.0.0.1:"+port+"/json")).json();target=tabs.find(t=>t.type==="page");if(target)break;}catch{}
+ for(let i=0;i<200;i++){
+  if(launchError||chrome.exitCode!==null)break;
+  try{if(!port){const active=fs.readFileSync(path.join(profile,"DevToolsActivePort"),"utf8");port=Number(active.split("\n")[0]);}const tabs=await (await fetch("http://127.0.0.1:"+port+"/json")).json();target=tabs.find(t=>t.type==="page");if(target)break;}catch{}
   await delay(150);
  }
- if(!target)throw Error("Could not connect to headless Chromium");
+ if(!target)throw Error("Could not connect to headless Chromium / "+browser+" / exit="+chrome.exitCode+" / "+(launchError?.message||"")+" / "+chromeLog);
  ws=new WebSocket(target.webSocketDebuggerUrl);
  await new Promise((resolve,reject)=>{ws.addEventListener("open",resolve,{once:true});ws.addEventListener("error",reject,{once:true});});
  let seq=0;const pending=new Map();

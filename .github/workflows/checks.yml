@@ -15,6 +15,15 @@ jobs:
           node-version: "22"
       - name: Test battle simulation
         run: node --test tests/*.test.mjs
+      - name: Play a real browser round
+        run: node tests/browser-smoke.mjs
+      - name: Upload screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: three-beats-browser-preview
+          path: artifacts/demo-preview.png
+          if-no-files-found: ignore
       - name: Verify static demo resources
         run: |
           test -f index.html

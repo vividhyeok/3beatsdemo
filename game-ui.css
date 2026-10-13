@@ -65,3 +65,26 @@ body{background:radial-gradient(ellipse at center top,#1b2845 0%,#060b14 78%);fo
 @keyframes actorBreath{0%,100%{translate:0 0}50%{translate:0 -5px}}
 @media(max-width:1100px){.top-bar-middle{display:none}.battle-arena{height:48vh;min-height:370px}.tactical-panel{display:none}.board{width:min(790px,90vw)}}
 @media(max-width:700px){.top-bar{padding:10px}.battle-header{top:70px;grid-template-columns:1fr 115px 1fr;padding:12px 8px}.fighter-hud img{width:35px;height:46px}.hud-name{font-size:13px}.stat-line{font-size:9px}.round-title{font-size:17px}.battle-arena{height:415px;min-height:415px;padding:150px 8px 8px}.board{height:205px;width:94vw}.unit,.unit-sprite{height:85px;width:65px}.sidebar{padding:9px 5px;gap:5px}.hero-choice{width:80px;height:51px}.hero-choice img{width:26px;height:37px}.hero-choice span small{display:none}.sidebar select{width:130px}.hand-section{padding:10px 6px}.cards.six,.cards.five{display:flex;grid-template-columns:none;overflow-x:auto;scrollbar-width:thin}.skill-card{min-width:129px}.card-art{height:91px}.queue-wrap{padding:10px 6px}.queue-main{display:block}.submit-area{margin-top:8px}.queue-card img{width:38px;height:32px}.queue-slot{padding:4px;min-height:61px}.queue-slot span{font-size:10px}}
+
+/* Secret card programming / sequential reveal */
+.battle-arena{min-height:520px;height:520px;max-height:none;padding-bottom:155px}
+.board-container{height:calc(100% - 28px)}
+.reveal-stage{position:absolute;bottom:15px;left:50%;transform:translateX(-50%);width:min(680px,74vw);z-index:7;background:#091222ed;border:1px solid #58739a;border-radius:9px;padding:9px 14px 5px;box-shadow:0 12px 28px #0008}
+.reveal-label{display:flex;justify-content:space-between;color:#b6d8ff;font:800 11px 'Barlow Condensed',sans-serif;letter-spacing:1.5px;margin-bottom:5px}
+.reveal-label span:last-child{color:#ffc4c6}
+.reveal-rows{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.reveal-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.reveal-card{height:83px;position:relative;overflow:hidden;background:#1d2c43;border:1px solid #526a8a;border-radius:5px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px #0008}
+.reveal-card>img{width:100%;height:100%;object-fit:cover;filter:saturate(.95)}
+.reveal-card>span{position:absolute;top:3px;left:4px;color:#e4eafa;background:#050a15b8;padding:2px 4px;font:800 9px 'Barlow Condensed',sans-serif;letter-spacing:1px}
+.reveal-card.facedown{border-color:#a477ce;box-shadow:inset 0 0 12px #8e55b850}
+.reveal-card.facedown img{object-fit:cover}
+.reveal-card.empty strong{font-size:22px;color:#52698b}
+.reveal-card-text{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,#080d18 25%);text-align:center;padding:14px 2px 3px;text-shadow:0 1px 4px black}
+.reveal-card-text b{font-size:10px;display:block;white-space:nowrap}
+.reveal-card-text small{font-size:8px;color:#abdeff}
+.reveal-card.flip{animation:beatCardFlip .7s ease-out both;border-color:#ffdd87;z-index:9}
+.reveal-message{text-align:center;color:#93abc8;font-size:10px;margin-top:5px}
+@keyframes beatCardFlip{0%{transform:rotateY(90deg) scale(.75);filter:brightness(2)}60%{transform:rotateY(-10deg) scale(1.12)}100%{transform:rotateY(0) scale(1)}}
+@media(max-width:1100px){.battle-arena{height:510px;min-height:510px}.reveal-stage{width:min(620px,94vw)}}
+@media(max-width:700px){.battle-arena{height:520px;min-height:520px;padding-bottom:145px}.reveal-stage{width:95vw;padding:8px}.reveal-rows{gap:8px}.reveal-card{height:66px}.board-container{height:calc(100% - 36px)}}

@@ -29,7 +29,7 @@ Keyboard: Tab navigates buttons; Enter activates the focused button or submits a
 
 ## Assets and architecture
 
-`game_ready/` contains all 76 curated WebP assets supplied in `THREE_BEATS_GAME_READY_27MB.zip`. The manifest and implementation brief are retained in `docs/asset-pack/`. `src/assets.js` maps their exact manifest paths. The eight `ui/buttons/` images are reference-only, as required by the brief; all interactive buttons use semantic HTML/CSS. Pre-rendered card numbers are covered by live engine-derived EN / DM / GR values in the hand. Older assets remain in source history but are not shipped in the new build, except the favicon.
+`game_ready/` contains all 76 curated WebP assets supplied in `THREE_BEATS_GAME_READY_27MB.zip`. The manifest and implementation brief are retained in `docs/asset-pack/`. `src/assets.js` maps their exact manifest paths. The eight `ui/buttons/` images are reference-only, as required by the brief; all interactive buttons use semantic HTML/CSS. Live engine-derived EN / DM / GR values appear below each complete card illustration; printed numbers in supplied art may differ. Older assets remain in source history but are not shipped in the new build, except the favicon.
 
 - `src/game.js`: deterministic rules and structured move / attack / damage / trap / push events. Presentation metadata can be disabled for AI simulations without changing results.
 - `src/ai.js`, `src/ai-worker.js`: original AI selection strategy, executed in a cancellable worker so the interface stays responsive. It never reads the current player's queue.

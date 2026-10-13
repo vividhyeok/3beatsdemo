@@ -4,5 +4,40 @@
 @media(max-width:700px){.menu-screen{background-position:38% center}.menu-screen:before{background:linear-gradient(0deg,#030811e8 5%,#03081155 70%)}.menu-actions{width:min(340px,86vw);margin:26vh auto 10vh;background:#050e1cc9}.menu-meta{font-size:8px;letter-spacing:1px;top:16px}.menu-meta span:last-child{display:none}.menu-footer{font-size:8px;letter-spacing:1px;bottom:10px}.menu-button{padding:14px;font-size:21px}.select-screen{padding:20px 14px}.screen-heading{gap:10px}.screen-heading h1{font-size:28px}.screen-heading button{font-size:10px;padding:9px}.fighter-roster{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.hero-choice img{height:190px}.hero-choice .hero-label{padding:10px}.hero-label b{font-size:20px}.hero-label small{font-size:8px}.match-setup{grid-template-columns:1fr;gap:20px;margin-top:15px;padding:16px}.profile-cards img{width:54px}.battle-top{height:auto;min-height:55px;flex-wrap:wrap;gap:8px;padding:10px}.battle-tools{gap:4px;flex-wrap:wrap}.battle-tools button{font-size:9px;padding:7px}.wordmark{font-size:14px}.wordmark small{font-size:7px}.battle-stage{height:490px}.battle-header{inset:10px 8px auto;grid-template-columns:1fr 95px 1fr;gap:6px}.fighter-hud{padding:7px;gap:0}.fighter-hud img{display:none}.hud-bars strong{font-size:12px;letter-spacing:1px}.hud-bars>span{font-size:8px;line-height:1.5}.fight-heading{gap:4px}.fight-heading>strong{font-size:12px;letter-spacing:0}.fight-heading>span{font-size:8px;letter-spacing:1px}.fight-heading small{font-size:7px;letter-spacing:0}.hp-meter{height:9px}.enemy-program{top:96px;right:10px}.reveal-card{width:35px}.enemy-program>.eyebrow{font-size:7px}.reveal-card b{font-size:6px}.board-container{top:57%;width:94vw;height:200px}.board{gap:4px}.unit{width:73px;height:110px}.unit-label{font-size:7px;padding:2px 4px}.tile .tile-label{font-size:7px;top:4px;left:4px}.combat-caption{bottom:34px;width:100%;padding:8px}.combat-caption p{font-size:10px}.combat-caption>span:last-child{font-size:8px}.range-legend{font-size:8px;gap:10px}.vfx{width:100px;height:100px}.vfx.attack-vfx{width:140px;height:100px}.float-label{font-size:19px}.float-label.miss,.float-label.guard{font-size:14px}.program-heading{display:block;margin-bottom:8px}.program-heading p{font-size:9px;margin-top:4px}.queue-main{grid-template-columns:1fr;gap:8px}.queue-slots{gap:5px}.queue-slot{padding:5px;gap:4px;min-height:66px}.queue-slot strong{font-size:9px}.queue-slot img{width:25px;height:37px}.queue-slot em{font-size:8px;bottom:2px}.submit-area{display:grid;grid-template-columns:1fr 1fr;align-items:center}.submit-area>span{text-align:left}.submit-area button{font-size:12px;min-height:38px}.hand-section{grid-template-columns:1fr;gap:12px}.cards{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}.deck-group:last-child .cards{grid-template-columns:repeat(5,minmax(0,1fr))}.skill-card{width:100%;min-width:0}.card-title{font-size:8px}.card-stats{font-size:7px;gap:1px}.card-bottom{padding:4px;min-height:41px}.card-art{max-height:none}.card-detail{font-size:9px}.command-dock{padding:10px 8px}.direction-choices{flex-wrap:wrap;font-size:10px}.result-copy{margin:40vh 5vw 5vh;width:90vw;padding:22px;background:#071321dd}.result-winner{height:65%;width:75%;right:0;top:0;bottom:auto}.result-loser{height:55%;width:65%;right:35%;top:8%;bottom:auto}.result-logo{height:75px}.result-copy h1{font-size:19px}.versus-overlay>div>img{height:65%}.versus-overlay strong{letter-spacing:3px}.menu-footer .text-button{font-size:9px}.battle-record{padding:10px}}
 @media(max-height:600px) and (min-width:701px){.menu-actions{margin-top:100px}.battle-stage{height:430px}.board-container{height:210px}.hero-choice img{height:200px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
-/* The engine values cover pre-rendered card statistics, which are not authoritative. */
-.live-card-rules{position:absolute;bottom:0;left:0;right:0;height:35%;z-index:2;display:flex;align-items:center;justify-content:space-evenly;gap:3px;background:linear-gradient(#132338,#07111f);border-top:1px solid #7ab5da66;box-shadow:0 -4px 12px #0006;color:#a7c9df;font-size:9px}.live-card-rules span{text-align:center;letter-spacing:1px}.live-card-rules b{display:block;color:#f4dfb5;font-size:17px;padding-top:4px}.vfx{animation-duration:calc(.48s / var(--playback-speed,1))}.float-label{animation-duration:calc(.6s / var(--playback-speed,1))}.battle-stage.paused *{animation-play-state:paused!important}@media(max-width:700px){.live-card-rules{font-size:6px;gap:0}.live-card-rules b{font-size:10px;padding-top:2px}.live-card-rules span{letter-spacing:0}}
+/* The engine values below each illustration are authoritative. */
+.vfx{animation-duration:calc(.48s / var(--playback-speed,1))}.float-label{animation-duration:calc(.6s / var(--playback-speed,1))}.battle-stage.paused *{animation-play-state:paused!important}
+
+/* Keep every illustrated card unobstructed. All authoritative values live below the art. */
+.skill-card{border-color:#607c98;background:#0c192a;box-shadow:0 6px 18px #0009}
+.card-art{max-height:none}
+.card-art img{height:100%;object-fit:contain}
+.card-art:after{display:none}
+.card-bottom{margin-top:0;min-height:51px;padding:7px 8px;border-top:1px solid #7199b266;background:linear-gradient(180deg,#162b42,#0a1728)}
+.card-title{font-size:11px;color:#f0f5ff}
+.card-stats{font-size:10px;align-items:center;gap:4px}
+.card-stats b{font-size:11px}
+.skill-card:disabled{opacity:.78;filter:saturate(.85)}
+.deck-group{min-width:0;padding:9px 10px 11px;border:1px solid #47637b55;background:#0b1829a8}
+.deck-heading{color:#a9d6ed;font-size:10px}
+.program-panel{padding-bottom:8px;border-bottom:1px solid #56778f66}
+@media(min-width:1600px){
+ .select-screen{padding:clamp(24px,3vw,52px) max(24px,3vw)}
+ .screen-heading,.fighter-roster,.match-setup{max-width:1680px}
+ .screen-heading{margin-left:auto;margin-right:auto}
+ .hero-choice img{height:clamp(260px,36vh,420px)}
+ .board-container{width:min(1450px,76vw);height:clamp(290px,35vh,410px)}
+ .fighter-hud,.fighter-hud.hostile{max-width:530px}
+ .fighter-hud img{width:64px;height:76px}
+ .battle-tools button{font-size:12px;padding:9px 13px}
+ .reveal-card{width:65px}
+ .unit{width:135px;height:185px}
+ .card-art{max-height:none}
+}
+@media(max-width:700px){
+ .deck-group{padding:8px}
+ .cards,.deck-group:last-child .cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ .card-bottom{min-height:49px;padding:6px}
+ .card-title{font-size:10px}
+ .card-stats{font-size:9px}
+ .card-stats b{font-size:10px}
+}

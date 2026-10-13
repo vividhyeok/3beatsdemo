@@ -1,63 +1,58 @@
-# THREE BEATS: SECTOR 12 — Playable Combat Demo
+﻿# THREE BEATS / SECTOR 12
 
-A browser-playable, deterministic 4 × 3 simultaneous-programming duel prototype for partner review and balance playtests. **Steam-only commercialization is planned; this build is an internal browser demo, not a public web-game monetization product.**
+A playable 4 x 3 simultaneous tactical duel. Choose a fighter, program three commands, then watch both fighters reveal and resolve each beat. Existing card costs, damage, movement, guards, traps, victory conditions, and AI strategy remain authoritative in `src/game.js` and `src/ai.js`.
 
-## Run
+## Run and build
 
-Open with any static HTTP server:
+No dependencies or external APIs are required. Serve the repository using any static HTTP server:
 
-```bash
+```sh
 python -m http.server 8080
-# http://localhost:8080
+# Open http://localhost:8080
+npm run build
+# Deploy the generated dist directory
 ```
 
-Or use VS Code Live Server. No dependencies, accounts, installs, or external APIs.
+`vercel.json` builds `dist` and sets a one-day revalidatable cache for the supplied assets. `classic.html` redirects to the complete game rather than loading the retired dashboard against the new renderer.
 
-## Included
+## Play
 
-- Four playable characters: JACK (pressure), EVE (range), RAVEN (traps), ZETA (mobility)
-- Six shared commands and five unique skills per character (11 selectable cards each)
-- Secret three-command queues, sequential simultaneous beat resolution
-- 4 × 3 arena, 120 HP / 45 starting EN, 10 rounds, central-control tiebreak
-- Deterministic hit / graze / miss geometry; simultaneous movement, collisions, guards, energy, KOs
-- Raven's visible delayed trap plus manual detonation, Zeta's directional skills
-- Easy / Normal / Expert AI using publicly available information (never reads the player's queue)
-- Card range preview, turn log, replay-like step animations, 3-slot planning, tutorial, settings
-- Korean-first responsive interface with procedurally created original SVG illustration
-- Automated engine tests and optional GitHub Actions checks
+- START and CHARACTER open the four-fighter selection screen. Choose opponent and Easy / Normal / Expert AI, then start the match.
+- Select three commands. A single click on a filled reservation removes it. Directional commands and Raven's trap require an explicit direction or tile.
+- CPU cards remain face down until their individual beat. One editable player queue is displayed.
+- Each beat plays reveal, simultaneous movement, actual attack ranges, attack VFX, hit/graze/miss/guard feedback, then knockback. Cyan identifies YOU; pink identifies CPU. Solid boundaries are direct hits, dashed boundaries are grazes.
+- HP popups show actual HP lost after guards and overkill. The caption names the attacker, card, origin, affected coordinates, grade, raw damage, guard reduction, and actual damage.
+- 1x / 2x, skip, pause, replay, menu navigation, alternate arena, and sound controls are available. Leaving a match cancels its AI worker and animation playback. Reduced-motion settings are respected.
+- Win, defeat, draw, KO, and the round limit use the original engine. Results composite the winner's win pose and loser's lose pose over the supplied result background. Rematch retains the matchup.
 
-## Controls
+Keyboard: Tab navigates buttons; Enter activates the focused button or submits a complete queue from the page; Backspace removes the last command; Escape cancels targeting or pauses; H opens the guide.
 
-Choose both fighters and AI difficulty. Select cards for the three slots; for some cards, choose direction or target square. Click queued commands to remove. Click **3비트 실행** when ready. Hover over a skill for its approximate range (actual target is determined after earlier simultaneous movements). Use **새 대전** to restart.
+## Assets and architecture
 
-## Authoritative prototype rules
+`game_ready/` contains all 76 curated WebP assets supplied in `THREE_BEATS_GAME_READY_27MB.zip`. The manifest and implementation brief are retained in `docs/asset-pack/`. `src/assets.js` maps their exact manifest paths. The eight `ui/buttons/` images are reference-only, as required by the brief; all interactive buttons use semantic HTML/CSS. Pre-rendered card numbers are covered by live engine-derived EN / DM / GR values in the hand. Older assets remain in source history but are not shipped in the new build, except the favicon.
 
-See `src/game.js` for the executable rule definitions and `src/ai.js` for the computer opponent. Card descriptions in the UI are generated from these rule records. No hand draws, hit chance, critical hits, or paid power.
+- `src/game.js`: deterministic rules and structured move / attack / damage / trap / push events. Presentation metadata can be disabled for AI simulations without changing results.
+- `src/ai.js`, `src/ai-worker.js`: original AI selection strategy, executed in a cancellable worker so the interface stays responsive. It never reads the current player's queue.
+- `src/combat-view.js`: coordinate-linked VFX and cancellable playback clock; approximately 1.88 seconds per beat at 1x.
+- `src/app.js`: menu, selection, queue editing, match lifecycle, secret reveals, settings, and transitions.
+- `src/result-view.js`: shared result compositor.
 
-### Intentional prototype exclusions
+High-resolution match assets are decoded before the VS introduction finishes. CSS uses cover backgrounds; character poses retain transparency. Desktop, tablet, and mobile layouts avoid horizontal page scrolling.
 
-Online multiplayer, Steam SDK, rank persistence, narrative story mode, soundtrack, character animation rigs and final art are **not** implemented. This is a playable mechanics demo for partner approval, not a commercial release.
+## Verification
 
-## Asset provenance
-
-All visual assets in `assets/` are newly authored procedural SVG shapes and icons. No InuYasha assets or third-party copyrighted game artwork are used.
-
-## Testing
-
-```bash
-node --test tests/*.test.mjs
+```sh
+npm test
+npm run test:browser
+npm run build
 ```
 
-For balancing, record side, character matchup, outcome, HP, and unexpected tactical loops. Numbers are initial assumptions and have not been statistically balanced.
+The 16 engine/asset/presentation tests cover queue rules, AI legality, simultaneous movement, hit geometry, guards, overkill, trap detonation, knockback, and per-attack guard allocation. Every matchup/card combination is compared between presentation and AI simulation modes.
 
-## Illustrated card pack (2026-10-13)
+The Chromium browser test uses actual mouse input and keyboard navigation. It checks all 76 image decodes, four fighter selections, queue editing, secret reveal timing, pause/2x/skip/cancel, actual AI match completion and rematch, four viewport sizes, and deterministic HIT/GRAZE/MISS/GUARD/movement/push/trap/win/defeat/draw scenarios through the production engine and renderer. Screenshots are written to ignored `artifacts/`. Test-only fixtures are served by the test server and excluded from the production build. Temporary Chromium profiles are cleaned after each run.
 
-The game UI supports image artwork for all 26 unique card IDs using `assets/cards/<character>/<shortname>.webp` and one common card back. Asset names are defined in `src/app.js`. The illustration pack is supplied separately as `three_beats_cards_all_26_ui_assets.zip`; copy the `assets/cards/` folder from that archive to the matching repository directory before packaging a public demo. Card numerical descriptions and hit logic are always derived from `src/game.js`, not the pre-rendered art.
+Chrome or Edge is supported on Windows; Chrome/Chromium is supported on Linux. GitHub Actions runs tests, the static build, and browser verification, and uploads screenshots.
 
-Game-first UI: `index.html` + `game-ui.css`. The previous dashboard remains at `classic.html` for comparison. Do not release the public build before card asset files are installed, and verify the browser smoke test.
+## Scope
 
-## Illustrated combat UI
-
-The 27 supplied PNG illustrations are mapped to the existing card IDs in `assets/cards`, including the secret card back. Desktop presents the shared and fighter decks together; smaller screens keep scrollable card rows. Combat presentation includes HP transitions, movement entrance, actual HP-loss numbers, guard feedback, impact shake, and sequential card reveals. Reduced-motion preferences are respected. Rules, card values, and AI behavior are unchanged.
-
-Run `npm test` for rules and `node tests/browser-smoke.mjs` for a Chromium round smoke test (Chrome or Edge on Windows; Chromium/Chrome on Linux). The smoke test checks image decoding and writes `artifacts/demo-preview.png`.
+This remains a local browser AI combat demo. Character animation uses the supplied static poses and composited VFX; the pack does not include skeletal or frame-by-frame character animation. Online multiplayer, Steam integration, ranked persistence, and a soundtrack are outside the existing demo scope.

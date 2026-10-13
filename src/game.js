@@ -132,7 +132,7 @@ function targetFor(me,face,action){
  else if(id==="zeta_ult"){dx=face;dy=action.direction==="up"?-1:1;}
  return {dx,dy,steps};
 }
-function performMovement(s,actions,ev){
+function performMovement(s,actions,ev,trace){
  const moves=s.fighters.map((me,i)=>targetFor(me,me.facing,actions[i]));
  for(let step=0;step<2;step++){
   const old=s.fighters.map(f=>({x:f.x,y:f.y}));
@@ -150,20 +150,28 @@ function performMovement(s,actions,ev){
     blocked[i]=true;
   }
   for(let i=0;i<2;i++){
-   if(!blocked[i]){s.fighters[i].x=wished[i].x;s.fighters[i].y=wished[i].y;}
+   if(!blocked[i]){
+    if(trace&&(old[i].x!==wished[i].x||old[i].y!==wished[i].y))ev.push({type:"move",side:i,card:actions[i].id,step,from:{...old[i]},to:{...wished[i]}});
+    s.fighters[i].x=wished[i].x;s.fighters[i].y=wished[i].y;
+   }
    else if((wished[i].x!==old[i].x||wished[i].y!==old[i].y))ev.push({type:"block",side:i,text:(i===0?"플레이어":"AI")+" 이동 충돌"});
   }
  }
  for(let i=0;i<2;i++)if(oldDiff(s.fighters[i],s.fighters[1-i])!==0)s.fighters[i].facing=oldDiff(s.fighters[i],s.fighters[1-i])>0?1:-1;
 }
 function oldDiff(a,b){return b.x-a.x;}
-function explosion(s,owner,pos,damage,glance,ev,label){
+function explosion(s,owner,pos,damage,glance,ev,label,trace,card){
  const other=1-owner,p=s.fighters[other],d=dist(pos,p),raw=d===0?damage:d===1?glance:0;
+ if(trace){
+  const direct=[{...pos}],grazing=[];
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(dist(pos,{x,y})===1)grazing.push({x,y});
+  ev.push({type:"attack",side:owner,card,source:label,origin:{...s.fighters[owner]},center:{...pos},target:{x:p.x,y:p.y},range:{direct,glance:grazing},grade:d===0?"direct":d===1?"graze":"miss",raw,explosion:true});
+ }
  if(raw){ev.push({type:"hit",side:other,amount:raw,source:label,grade:d===0?"direct":"graze"});return raw;}
  ev.push({type:"miss",side:owner,text:label+" 빗나감"});
  return 0;
 }
-export function resolveRound(input,queues){
+export function resolveRound(input,queues,{presentation=true}={}){
  const s=structuredClone(input);if(s.winner!==null||s.status==="finished")return {state:s,frames:[]};
  const errors=queues.map((q,i)=>validateQueue(s,i,q));if(errors.some(Boolean))throw Error(errors.filter(Boolean).join(" / "));
  const frames=[];
@@ -182,11 +190,12 @@ export function resolveRound(input,queues){
    ev.push({type:"action",side:i,text:c.name});
   }
   const moving=actions.map((a,i)=>active[i]?a:{id:"idle"});
-  performMovement(s,moving,ev);
+  performMovement(s,moving,ev,presentation);
+  const movement=presentation?structuredClone(s):null;
   const rawDamage=[0,0],pushes=[];
   // Environment and traps trigger after movement, before current attacks.
   if(s.trap&&s.trap.armedRound===s.round&&beat===2&&!(active[s.trap.owner]&&actions[s.trap.owner].id==="raven_ult")){
-   const t=s.trap;rawDamage[1-t.owner]+=explosion(s,t.owner,t.pos,40,20,ev,"좌표 각인");
+   const t=s.trap;rawDamage[1-t.owner]+=explosion(s,t.owner,t.pos,40,20,ev,"좌표 각인",presentation,"raven_trap");
    s.trap=null;
   }
   for(let i=0;i<2;i++){
@@ -197,17 +206,18 @@ export function resolveRound(input,queues){
        !(s.fighters[0].x===a.target.x&&s.fighters[0].y===a.target.y)&&
        !(s.fighters[1].x===a.target.x&&s.fighters[1].y===a.target.y)){
       s.trap={owner:i,pos:{...a.target},armedRound:s.round+1};
-      ev.push({type:"trap",side:i,text:"함정 설치 ("+(a.target.x+1)+","+(a.target.y+1)+")"});
+      ev.push({type:"trap",side:i,card:id,pos:{...a.target},text:"함정 설치 ("+(a.target.x+1)+","+(a.target.y+1)+")"});
     }else ev.push({type:"fizzle",side:i,text:"함정 설치 위치 무효"});
     continue;
    }
    if(id==="raven_ult"){
     if(s.trap&&s.trap.owner===i){
-     const t=s.trap;rawDamage[other]+=explosion(s,i,t.pos,60,30,ev,"과부하");s.trap=null;
+     const t=s.trap;rawDamage[other]+=explosion(s,i,t.pos,60,30,ev,"과부하",presentation,"raven_ult");s.trap=null;
     }continue;
    }
    const r=rangeAt(s,i,a);const p=s.fighters[other];
    const grade=inCells(r.direct,p)?"direct":inCells(r.glance,p)?"graze":null;
+   if(presentation&&(c.damage>0||id==="raven_ward"))ev.push({type:"attack",side:i,card:id,source:c.name,origin:{...s.fighters[i]},target:{x:p.x,y:p.y},range:structuredClone(r),grade:grade||"miss",raw:grade==="direct"?c.damage:grade==="graze"?c.glance:0});
    if(grade){
     rawDamage[other]+=grade==="direct"?c.damage:c.glance;
     ev.push({type:"hit",side:other,amount:grade==="direct"?c.damage:c.glance,source:c.name,grade});
@@ -215,21 +225,29 @@ export function resolveRound(input,queues){
    }else if(c.damage>0||id==="raven_ward")ev.push({type:"miss",side:i,text:c.name+" 빗나감"});
   }
   for(let i=0;i<2;i++){
-   const dealt=Math.max(0,rawDamage[i]-guards[i]);s.fighters[i].hp=Math.max(0,s.fighters[i].hp-dealt);
+   const hpBefore=s.fighters[i].hp,dealt=Math.max(0,rawDamage[i]-guards[i]);s.fighters[i].hp=Math.max(0,s.fighters[i].hp-dealt);
    s.fighters[i].damageTaken+=dealt;
+   if(presentation)ev.push({type:"damage",side:i,pos:{x:s.fighters[i].x,y:s.fighters[i].y},raw:rawDamage[i],blocked:Math.min(rawDamage[i],guards[i]),dealt,hpBefore,hpAfter:s.fighters[i].hp,actual:hpBefore-s.fighters[i].hp});
    if(rawDamage[i]&&guards[i])ev.push({type:"guard",side:i,amount:Math.min(rawDamage[i],guards[i]),text:"방어 감소"});
+  }
+  if(presentation){
+   const remainingGuard=[...guards],remainingHP=movement.fighters.map(f=>f.hp);
+   for(const attack of ev.filter(e=>e.type==="attack")){
+    const target=1-attack.side;attack.blocked=Math.min(attack.raw,remainingGuard[target]);remainingGuard[target]-=attack.blocked;
+    attack.dealt=attack.raw-attack.blocked;attack.actual=Math.min(attack.dealt,remainingHP[target]);remainingHP[target]-=attack.actual;
+   }
   }
   for(const p of pushes){
    const f=s.fighters[p.side],nx=f.x+p.dir;
    const other=s.fighters[1-p.side];
-   if(inside(nx,f.y)&&!(nx===other.x&&f.y===other.y)){f.x=nx;ev.push({type:"push",side:p.side,text:"밀려남"});}
+   if(inside(nx,f.y)&&!(nx===other.x&&f.y===other.y)){f.x=nx;ev.push({type:"push",side:p.side,from:{x:nx-p.dir,y:f.y},to:{x:nx,y:f.y},text:"밀려남"});}
   }
   if(s.fighters[0].hp===0||s.fighters[1].hp===0){
    s.status="finished";s.winner=s.fighters[0].hp===s.fighters[1].hp?-1:(s.fighters[0].hp>0?0:1);
   }
   const headline="R"+s.round+" · BEAT "+beat;
-  s.log=[headline+" — "+ev.map(x=>x.text||x.source+" "+x.amount).join(" / "),...s.log].slice(0,50);
-  frames.push({round:s.round,beat,actions:structuredClone(actions),events:ev,state:structuredClone(s)});
+  s.log=[headline+" — "+ev.filter(x=>!["move","attack","damage"].includes(x.type)).map(x=>x.text||x.source+" "+x.amount).join(" / "),...s.log].slice(0,50);
+  frames.push({round:s.round,beat,actions:structuredClone(actions),events:ev,...(presentation?{movement}:{}),state:structuredClone(s)});
   if(s.status==="finished")break;
  }
  s.history.push({round:s.round,queues:structuredClone(queues)});

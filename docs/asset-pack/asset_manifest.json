@@ -1,0 +1,615 @@
+{
+  "project": "THREE BEATS",
+  "total_originals": 127,
+  "total_curated": 76,
+  "assets": [
+    {
+      "id": "ui/backgrounds/main_menu",
+      "path": "game_ready/ui/backgrounds/main_menu.webp",
+      "original": "originals/네온_메가시티의_세ctor_12_영웅들.png",
+      "source_has_alpha": false,
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": "ui/backgrounds/arena_primary",
+      "path": "game_ready/ui/backgrounds/arena_primary.webp",
+      "original": "originals/대칭형_미래형_에너지_아레나.png",
+      "source_has_alpha": false,
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": "ui/backgrounds/arena_alt",
+      "path": "game_ready/ui/backgrounds/arena_alt.webp",
+      "original": "originals/비_내리는_네온_사이버펑크_아레나.png",
+      "source_has_alpha": false,
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": "ui/backgrounds/character_select",
+      "path": "game_ready/ui/backgrounds/character_select.webp",
+      "original": "originals/네온_미래도시를_품은_사이버펑크_아레나.png",
+      "source_has_alpha": false,
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": "ui/backgrounds/result",
+      "path": "game_ready/ui/backgrounds/result.webp",
+      "original": "originals/네온_사이버펑크_미래_경기장.png",
+      "source_has_alpha": false,
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": "characters/jack/profile",
+      "path": "game_ready/characters/jack/profile.webp",
+      "original": "originals/붉은_종말의_검객.png",
+      "source_has_alpha": false,
+      "width": 1122,
+      "height": 1402
+    },
+    {
+      "id": "characters/eve/profile",
+      "path": "game_ready/characters/eve/profile.webp",
+      "original": "originals/푸른_조준선의_사이버_스나이퍼.png",
+      "source_has_alpha": false,
+      "width": 1122,
+      "height": 1402
+    },
+    {
+      "id": "characters/raven/profile",
+      "path": "game_ready/characters/raven/profile.webp",
+      "original": "originals/네온_보랏빛_까마귀_부적술사.png",
+      "source_has_alpha": false,
+      "width": 1122,
+      "height": 1402
+    },
+    {
+      "id": "characters/zeta/profile",
+      "path": "game_ready/characters/zeta/profile.webp",
+      "original": "originals/황금빛_사이버펑크_전사_릴리아너.png",
+      "source_has_alpha": false,
+      "width": 1122,
+      "height": 1402
+    },
+    {
+      "id": "characters/jack/win",
+      "path": "game_ready/characters/jack/win.webp",
+      "original": "originals/붉은_대검의_사이버펑크_잭.png",
+      "source_has_alpha": true,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "characters/eve/win",
+      "path": "game_ready/characters/eve/win.webp",
+      "original": "originals/실버_사이버펑크_저격수_diva.png",
+      "source_has_alpha": true,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "characters/raven/win",
+      "path": "game_ready/characters/raven/win.webp",
+      "original": "originals/보라빛_까마귀_마녀의_마법_군무.png",
+      "source_has_alpha": true,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "characters/zeta/win",
+      "path": "game_ready/characters/zeta/win.webp",
+      "original": "originals/골드와_블랙의_승리_포즈_제타.png",
+      "source_has_alpha": true,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "characters/jack/lose",
+      "path": "game_ready/characters/jack/lose.webp",
+      "original": "originals/무릎_꿇은_붉은_전사의_검.png",
+      "source_has_alpha": true,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "characters/eve/lose",
+      "path": "game_ready/characters/eve/lose.webp",
+      "original": "originals/패배감에_웅크린_푸른_저격수.png",
+      "source_has_alpha": true,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "characters/raven/lose",
+      "path": "game_ready/characters/raven/lose.webp",
+      "original": "originals/무너지는_까마귀_마녀와_보랏빛_마법.png",
+      "source_has_alpha": true,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "characters/zeta/lose",
+      "path": "game_ready/characters/zeta/lose.webp",
+      "original": "originals/쓰러진_사이버펑크_전사_zeta.png",
+      "source_has_alpha": true,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "ui/logos/win",
+      "path": "game_ready/ui/logos/win.webp",
+      "original": "originals/골드_사이버펑크_win_엠블럼.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/logos/defeat",
+      "path": "game_ready/ui/logos/defeat.webp",
+      "original": "originals/네온_레드_메탈릭_사이버펑크_defeat_로고.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/logos/draw",
+      "path": "game_ready/ui/logos/draw.webp",
+      "original": "originals/미래형_사이버펑크_draw_로고.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/logos/vs",
+      "path": "game_ready/ui/logos/vs.webp",
+      "original": "originals/사이버_메탈_vs_엠블럼.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/logos/ready",
+      "path": "game_ready/ui/logos/ready.webp",
+      "original": "originals/네온_사이파이_ready_hud_로고.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/logos/round_start",
+      "path": "game_ready/ui/logos/round_start.webp",
+      "original": "originals/미래형_라운드_시작_hud_배너.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/logos/final_round",
+      "path": "game_ready/ui/logos/final_round.webp",
+      "original": "originals/황금빛_파이널_라운드_엠블럼.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/logos/ko",
+      "path": "game_ready/ui/logos/ko.webp",
+      "original": "originals/사이버펑크_메탈_ko_로고.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/logos/pause",
+      "path": "game_ready/ui/logos/pause.webp",
+      "original": "originals/미래형_메탈릭_pause_배너.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/logos/start",
+      "path": "game_ready/ui/logos/start.webp",
+      "original": "originals/미래형_사이버펑크_start_로고.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/buttons/start",
+      "path": "game_ready/ui/buttons/start.webp",
+      "original": "originals/네온_사이버펑크_start_버튼.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/buttons/back",
+      "path": "game_ready/ui/buttons/back.webp",
+      "original": "originals/사이버펑크_back_버튼_ui.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/buttons/confirm",
+      "path": "game_ready/ui/buttons/confirm.webp",
+      "original": "originals/황금빛_사이버펑크_확인_버튼.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/buttons/execute",
+      "path": "game_ready/ui/buttons/execute.webp",
+      "original": "originals/사이버펑크_3_beats_execute_버튼.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/buttons/options",
+      "path": "game_ready/ui/buttons/options.webp",
+      "original": "originals/네온_사이버펑크_옵션_버튼.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/buttons/exit",
+      "path": "game_ready/ui/buttons/exit.webp",
+      "original": "originals/사이버펑크_네온_exit_버튼.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/buttons/character",
+      "path": "game_ready/ui/buttons/character.webp",
+      "original": "originals/미래형_골드_블루_캐릭터_버튼.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "ui/buttons/vs_mode",
+      "path": "game_ready/ui/buttons/vs_mode.webp",
+      "original": "originals/사이버펑크_vs_모드_네온_배너.png",
+      "source_has_alpha": true,
+      "width": 2172,
+      "height": 724
+    },
+    {
+      "id": "vfx/jack/slash_red",
+      "path": "game_ready/vfx/jack/slash_red.webp",
+      "original": "originals/붉은_에너지_초승달_참격.png",
+      "source_has_alpha": true,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "vfx/jack/slash_alt",
+      "path": "game_ready/vfx/jack/slash_alt.webp",
+      "original": "originals/붉은_에너지_검격_아크.png",
+      "source_has_alpha": true,
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "id": "vfx/eve/laser_blue",
+      "path": "game_ready/vfx/eve/laser_blue.webp",
+      "original": "originals/블루_에너지_레이저_빔.png",
+      "source_has_alpha": true,
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": "vfx/eve/laser_alt",
+      "path": "game_ready/vfx/eve/laser_alt.webp",
+      "original": "originals/청사진빛_미래형_레이저_빔_효과.png",
+      "source_has_alpha": true,
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "id": "vfx/raven/portal_purple",
+      "path": "game_ready/vfx/raven/portal_purple.webp",
+      "original": "originals/네온_보랏빛_마법_소환진_포털.png",
+      "source_has_alpha": true,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "vfx/raven/rune_purple",
+      "path": "game_ready/vfx/raven/rune_purple.webp",
+      "original": "originals/네온_보랏빛_마법_에너지_문양.png",
+      "source_has_alpha": true,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "vfx/zeta/dash_gold",
+      "path": "game_ready/vfx/zeta/dash_gold.webp",
+      "original": "originals/황금빛_고속_대시_트레일_효과.png",
+      "source_has_alpha": true,
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": "vfx/zeta/dash_alt",
+      "path": "game_ready/vfx/zeta/dash_alt.webp",
+      "original": "originals/황금빛_초고속_에너지_대시_궤적.png",
+      "source_has_alpha": true,
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "id": "vfx/common/hit_explosion",
+      "path": "game_ready/vfx/common/hit_explosion.webp",
+      "original": "originals/황금빛_폭발_충격_vfx_효과.png",
+      "source_has_alpha": true,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "vfx/common/shield_hit",
+      "path": "game_ready/vfx/common/shield_hit.webp",
+      "original": "originals/사이버_에너지_방패_충돌_효과.png",
+      "source_has_alpha": true,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "vfx/common/shield_blue",
+      "path": "game_ready/vfx/common/shield_blue.webp",
+      "original": "originals/푸른_육각_방어막_충돌_폭발.png",
+      "source_has_alpha": true,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "vfx/common/dust",
+      "path": "game_ready/vfx/common/dust.webp",
+      "original": "originals/푸른_회색_충격_먼지_폭발.png",
+      "source_has_alpha": true,
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "id": "vfx/common/lightning",
+      "path": "game_ready/vfx/common/lightning.webp",
+      "original": "originals/전기_에너지_폭발_효과.png",
+      "source_has_alpha": true,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "vfx/common/hud_ring",
+      "path": "game_ready/vfx/common/hud_ring.webp",
+      "original": "originals/청록빛_미래형_홀로그램_hud_링.png",
+      "source_has_alpha": true,
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "id": "cards/back",
+      "path": "game_ready/cards/back.webp",
+      "original": "originals/네온_사이버_아케인_카드_뒷면.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/common/forward",
+      "path": "game_ready/cards/common/forward.webp",
+      "original": "originals/전진_픽셀_전술_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/common/back",
+      "path": "game_ready/cards/common/back.webp",
+      "original": "originals/후퇴_사이버_전술_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/common/up",
+      "path": "game_ready/cards/common/up.webp",
+      "original": "originals/위로_이동_네온_전술_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/common/down",
+      "path": "game_ready/cards/common/down.webp",
+      "original": "originals/아래로_이동_사이버_전술_카드.png",
+      "source_has_alpha": false,
+      "width": 1086,
+      "height": 1448
+    },
+    {
+      "id": "cards/common/guard",
+      "path": "game_ready/cards/common/guard.webp",
+      "original": "originals/방어_네온_실드_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/common/focus",
+      "path": "game_ready/cards/common/focus.webp",
+      "original": "originals/집중_네온_에너지_회복_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/jack/jab",
+      "path": "game_ready/cards/jack/jab.webp",
+      "original": "originals/견제_베기_잭_스킬_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/jack/dash",
+      "path": "game_ready/cards/jack/dash.webp",
+      "original": "originals/압박_돌진_스킬_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/jack/slam",
+      "path": "game_ready/cards/jack/slam.webp",
+      "original": "originals/대검_내려찍기_전술_스킬_카드.png",
+      "source_has_alpha": false,
+      "width": 1086,
+      "height": 1448
+    },
+    {
+      "id": "cards/jack/spin",
+      "path": "game_ready/cards/jack/spin.webp",
+      "original": "originals/회전_베기_잭의_스핀_슬래시_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/jack/ult",
+      "path": "game_ready/cards/jack/ult.webp",
+      "original": "originals/파쇄선_루프처_라인.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/eve/aim",
+      "path": "game_ready/cards/eve/aim.webp",
+      "original": "originals/가늠탄_이브_스킬_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/eve/pierce",
+      "path": "game_ready/cards/eve/pierce.webp",
+      "original": "originals/관통사격_사이버펑크_스킬_카드.png",
+      "source_has_alpha": false,
+      "width": 1086,
+      "height": 1448
+    },
+    {
+      "id": "cards/eve/retreat",
+      "path": "game_ready/cards/eve/retreat.webp",
+      "original": "originals/후퇴사격_네온_스나이퍼_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/eve/cross",
+      "path": "game_ready/cards/eve/cross.webp",
+      "original": "originals/교차조준_사이버_저격수_eve.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/eve/ult",
+      "path": "game_ready/cards/eve/ult.webp",
+      "original": "originals/이브의_멸점저격_스킬_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/raven/jab",
+      "path": "game_ready/cards/raven/jab.webp",
+      "original": "originals/부적_타격_레이븐_스킬_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/raven/push",
+      "path": "game_ready/cards/raven/push.webp",
+      "original": "originals/레이븐의_역위상_스킬_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/raven/trap",
+      "path": "game_ready/cards/raven/trap.webp",
+      "original": "originals/좌표_각인_레이븐의_함정_설치_карточка.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/raven/ward",
+      "path": "game_ready/cards/raven/ward.webp",
+      "original": "originals/보랏빛_경계_부적_레이븐의_마법_방벽.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/raven/ult",
+      "path": "game_ready/cards/raven/ult.webp",
+      "original": "originals/네온_퍼플_오버로드_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/zeta/jab",
+      "path": "game_ready/cards/zeta/jab.webp",
+      "original": "originals/톤파_견제_제타의_황금_돌진.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/zeta/slide",
+      "path": "game_ready/cards/zeta/slide.webp",
+      "original": "originals/사이드_슬라이드_픽셀_스킬_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/zeta/long",
+      "path": "game_ready/cards/zeta/long.webp",
+      "original": "originals/롱_슬라이드_사이버_스킬_카드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/zeta/brake",
+      "path": "game_ready/cards/zeta/brake.webp",
+      "original": "originals/브레이크_제타의_황금_방어_슬라이드.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    },
+    {
+      "id": "cards/zeta/ult",
+      "path": "game_ready/cards/zeta/ult.webp",
+      "original": "originals/엇박_난무_골든_사이버_슬래시.png",
+      "source_has_alpha": false,
+      "width": 1024,
+      "height": 1536
+    }
+  ]
+}

@@ -1,254 +1,59 @@
-import {CHARACTERS,COMMON,UNIQUE,CARD_MAP,deckOf,newGame,options,rangeAt,validateQueue,resolveRound,dist,MAX_HP,MAX_EN} from "./game.js";
-import {chooseAI} from "./ai.js";
-
-let selection={player:"jack",enemy:"eve",difficulty:"normal"};
-let match=newGame(selection.player,selection.enemy),view=match,queue=[],pending=null,preview=null,playing=false,sound=true,revealed=[],enemyPlan=[],playerPlan=[],runToken=0;
-const $=sel=>document.querySelector(sel);
-function imageFor(id){return "assets/cards/"+id+".png";}
-
-const escapeHtml=x=>String(x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function who(i){return CHARACTERS[view.fighters[i].character];}
-function playSound(kind="tap"){
- if(!sound)return;
- try{
-  const ctx=new (window.AudioContext||window.webkitAudioContext)(),osc=ctx.createOscillator(),gain=ctx.createGain();
-  osc.connect(gain);gain.connect(ctx.destination);
-  osc.type=kind==="hit"?"sawtooth":"sine";
-  osc.frequency.setValueAtTime(kind==="hit"?135:kind==="pick"?540:330,ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(kind==="hit"?55:210,ctx.currentTime+.13);
-  gain.gain.setValueAtTime(.038,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.18);
-  osc.start();osc.stop(ctx.currentTime+.2);setTimeout(()=>ctx.close(),350);
- }catch{}
+import {CHARACTERS,COMMON,UNIQUE,CARD_MAP,newGame,options,rangeAt,validateQueue,resolveRound,MAX_HP,MAX_EN} from './game.js';
+import {asset,ASSETS,portrait,cardImage} from './assets.js';
+import {renderResult} from './result-view.js';
+import {PlaybackClock,CombatRenderer,playCombatFrame} from './combat-view.js';
+const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let selection={player:'jack',enemy:'eve',difficulty:'normal'},match=newGame(),view=match,queue=[],pending=null,preview=null,screen='menu',playing=false,revealed=0,enemyPlan=[],clock=null,worker=null,workerReject=null,generation=0,sound=true,speed=1,audio=null,toastTimer=null;
+const renderer=new CombatRenderer();
+function phase(name,message){$('#phase-label').textContent=name;$('#combat-message').textContent=message;$('#battle-stage').dataset.phase=name;}
+function ping(hit=false){if(!sound)return;try{audio??=new AudioContext();audio.resume();const osc=audio.createOscillator(),gain=audio.createGain();osc.connect(gain);gain.connect(audio.destination);osc.type=hit?'triangle':'sine';osc.frequency.setValueAtTime(hit?125:520,audio.currentTime);osc.frequency.exponentialRampToValueAtTime(80,audio.currentTime+.12);gain.gain.setValueAtTime(.035,audio.currentTime);gain.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+.16);osc.start();osc.stop(audio.currentTime+.17);}catch{}}
+function toast(message){clearTimeout(toastTimer);$('#toast').textContent=message;$('#toast').hidden=false;toastTimer=setTimeout(()=>$('#toast').hidden=true,2600);}
+function cancel(){generation++;$('#battle-stage').classList.remove('paused');clock?.cancel();clock=null;worker?.terminate();worker=null;workerReject?.(new DOMException('Cancelled','AbortError'));workerReject=null;playing=false;$('#versus-overlay').hidden=true;$('#stage-banner').hidden=true;for(const d of document.querySelectorAll('dialog[open]'))d.close();renderer.clear();for(const el of document.querySelectorAll('.unit'))el.getAnimations().forEach(a=>a.cancel());clearTimeout(toastTimer);$('#toast').hidden=true;}
+function showScreen(next){screen=next;for(const id of ['menu','select','battle','result'])$('#'+id+'-screen').hidden=id!==next;requestAnimationFrame(()=>{if(screen!==next)return;const target=$('#'+next+'-screen button:not(:disabled)');target?.focus({preventScroll:true});});window.scrollTo(0,0);}
+function navigate(next){cancel();if(next==='select')renderSelection();showScreen(next);}
+function renderSelection(){
+ $('#player-options').innerHTML=Object.entries(CHARACTERS).map(([id,c])=>'<button class="hero-choice '+(id===selection.player?'active':'')+'" data-pick-player="'+id+'" aria-pressed="'+(id===selection.player)+'" style="--accent:'+c.color+'"><img src="'+portrait(id)+'" alt="'+c.ko+'" loading="eager"><div class="hero-label"><b>'+c.name+'</b><small>'+c.ko+' / '+c.role+'</small></div></button>').join('');
+ const c=CHARACTERS[selection.player];$('#fighter-profile').innerHTML='<span class="eyebrow">'+c.role+' / '+c.title+'</span><h2 style="color:'+c.color+'">'+c.name+' / '+c.ko+'</h2><p>'+c.desc+'</p><div class="profile-cards">'+UNIQUE[selection.player].map(c=>'<img src="'+cardImage(c.id)+'" alt="'+c.name+'" loading="lazy" title="'+esc(c.description)+'">').join('')+'</div>';
+ $('#enemy-select').innerHTML=Object.entries(CHARACTERS).filter(([id])=>id!==selection.player).map(([id,c])=>'<option value="'+id+'" '+(id===selection.enemy?'selected':'')+'>'+c.name+' / '+c.ko+'</option>').join('');$('#difficulty').value=selection.difficulty;
 }
-function toast(text){const t=$("#toast");t.textContent=text;t.classList.add("show");clearTimeout(toast.timeout);toast.timeout=setTimeout(()=>t.classList.remove("show"),2300);}
-function reset(){
- runToken++;revealed=[];enemyPlan=[];playerPlan=[];
- match=newGame(selection.player,selection.enemy);view=match;queue=[];pending=null;preview=null;playing=false;
- render();toast("새 대전이 시작되었습니다.");playSound();
+function renderHUD(){for(let i=0;i<2;i++){const f=view.fighters[i],c=CHARACTERS[f.character],side=i?'enemy':'player';$('#'+side+'-name').textContent=c.name;$('#'+side+'-name').style.color=c.color;$('#'+side+'-stat').textContent=f.hp+'/'+MAX_HP+' HP / '+f.en+'/'+MAX_EN+' EN';$('#'+side+'-hp').style.width=f.hp/MAX_HP*100+'%';$('#'+side+'-en').style.width=f.en/MAX_EN*100+'%';$('#'+side+'-portrait').src=portrait(f.character);$('#'+side+'-portrait').alt=c.ko;}$('#round-counter').textContent='ROUND '+view.round+' / 10';$('#beat-counter').textContent=playing?'BEAT '+view.beat+' / 3':'PLAN 3 BEATS';$('#control-score').textContent=view.score.join(' : ');}
+function renderBoard(){let html='';const targets=pending?.id==='raven_trap'?options(match,0,pending.id):[];for(let y=0;y<3;y++)for(let x=0;x<4;x++){const target=targets.some(a=>a.target.x===x&&a.target.y===y),trap=view.trap?.pos.x===x&&view.trap?.pos.y===y;html+='<button class="tile'+(target?' can-target':'')+'" data-tile="'+x+','+y+'" aria-label="좌표 '+(x+1)+','+(y+1)+(trap?' / 설치 함정':'')+'"><span class="tile-label">'+(x+1)+':'+(y+1)+'</span>'+((x===1||x===2)&&y===1?'<span class="center-mark">+</span>':'')+(trap?'<img class="trap-mark" src="'+asset('vfx/raven/rune_purple')+'" alt="함정">':'')+'</button>';}
+ $('#board').innerHTML=html;renderer.actors(view);if(preview){const r=rangeAt(view,0,preview);for(const [grade,list] of Object.entries(r))for(const p of list)$('[data-tile="'+p.x+','+p.y+'"]').classList.add(grade==='direct'?'preview-direct':'preview-graze');}$('#arena-caption').textContent=pending?.id==='raven_trap'?'빈 타일을 선택해 함정을 설치하세요.':preview?'현재 위치 기준 예상 범위 / 이동 후 실제 범위는 실행 시 표시':'4 x 3 ARENA / 중앙 두 칸은 동점 시 점령 점수에 반영';}
+function projectedEN(){return queue.reduce((en,a)=>a.id==='focus'?Math.min(MAX_EN,en+30):en-CARD_MAP[a.id].cost,match.fighters[0].en);}
+function cardHTML(c){const disabled=playing||queue.length===3||(!c.repeat&&queue.some(a=>a.id===c.id));return '<button class="skill-card'+(pending?.id===c.id?' active':'')+'" data-card="'+c.id+'" '+(disabled?'disabled':'')+' aria-label="'+esc(c.name+' / '+c.cost+' EN / '+c.description)+'" title="'+esc(c.description)+'"><div class="card-art"><img src="'+cardImage(c.id)+'" alt="" loading="lazy"><div class="live-card-rules"><span>EN <b>'+c.cost+'</b></span><span>DM <b>'+c.damage+'</b></span><span>GR <b>'+c.glance+'</b></span></div></div><div class="card-bottom"><div class="card-title">'+c.name+'</div><div class="card-stats"><b>'+c.cost+' EN</b><span>'+(c.damage?'DM '+c.damage+' / GR '+c.glance:c.kind==='defense'?'GUARD':c.kind==='energy'?'+30 EN':'MOVE')+'</span></div></div></button>';}
+function renderCommands(){
+ $('#common-cards').innerHTML=COMMON.map(cardHTML).join('');$('#unique-cards').innerHTML=UNIQUE[selection.player].map(cardHTML).join('');$('#unique-heading').innerHTML=CHARACTERS[selection.player].name+' / UNIQUE <span>고유 기술 / 5</span>';
+ $('#queue').innerHTML=Array.from({length:3},(_,i)=>{const a=queue[i],c=a&&CARD_MAP[a.id];return '<button class="queue-slot '+(c?'filled':'')+'" data-remove="'+i+'" '+(playing?'disabled':'')+' aria-label="BEAT '+(i+1)+(c?' / '+esc(c.name)+' / 클릭해 삭제':' / 비어 있음')+'"><small>BEAT '+(i+1)+'</small>'+(c?'<img src="'+cardImage(c.id)+'" alt=""><strong>'+c.name+'</strong><em>'+(a.direction||a.target?esc(a.direction||'('+(a.target.x+1)+','+(a.target.y+1)+')')+' / ':'')+(playing?'LOCKED':'삭제 x')+'</em>':'<span class="empty">+ SELECT</span>')+'</button>';}).join('');
+ $('#queue-count').textContent=queue.length+'/3';$('#projected-en').textContent='예약 후 EN '+projectedEN()+' / 100';$('#execute').disabled=playing||queue.length!==3||!!pending;$('#execute').textContent=playing?'전투 진행 중':'3비트 실행';$('[data-action="skip"]').disabled=!playing;$('#hint').textContent=pending?'방향 또는 빈 목표 타일을 선택하세요.':playing?'카드를 비트마다 공개하고 동시에 판정합니다.':queue.length===3?'준비 완료 / 실행 또는 예약 카드 클릭으로 수정':'카드를 선택하세요. 예약한 카드는 한 번 클릭해 삭제합니다.';
+ const pane=$('#direction-choices');pane.hidden=!pending;if(pending){const c=CARD_MAP[pending.id];pane.innerHTML='<span>'+c.name+' / '+(c.target?'보드에서 목표 선택':'방향 선택')+'</span>'+(c.directions||[]).map(d=>'<button data-dir="'+d+'">'+({up:'위',down:'아래',forward:'전진',back:'후퇴'}[d])+'</button>').join('')+'<button data-action="cancel-pending">취소</button>';}
 }
-function projectedEN(){
- let n=match.fighters[0].en;
- for(const a of queue){const c=CARD_MAP[a.id];n=a.id==="focus"?Math.min(MAX_EN,n+30):n-c.cost;}
- return n;
+function renderEnemy(){const index=revealed-1;$('#enemy-reveal').innerHTML=Array.from({length:3},(_,i)=>{const open=i<revealed,c=open&&CARD_MAP[enemyPlan[i]?.id];return '<div class="reveal-card '+(c?'open':'facedown')+(playing&&i===index?' flip':'')+'" data-beat="'+i+'"><img src="'+(c?cardImage(c.id):asset('cards/back'))+'" alt="'+(c?c.name:'비공개 카드 뒷면')+'"><span>BEAT '+(i+1)+'</span>'+(c?'<b>'+c.name+'</b>':'')+'</div>';}).join('');}
+function renderLog(){$('#combat-log').innerHTML=view.log.slice(0,12).map(s=>'<div class="log-entry">'+esc(s)+'</div>').join('');}
+function render(){renderHUD();renderBoard();renderCommands();renderEnemy();renderLog();}
+function selectCard(id){if(playing||screen!=='battle'||queue.length===3)return;const c=CARD_MAP[id];if(!c.repeat&&queue.some(a=>a.id===id))return;if(c.cost>projectedEN()){toast('기력이 부족합니다. 집중을 먼저 예약하세요.');return;}if(id==='raven_ult'){let trap=match.trap?.owner===0;for(const a of queue){if(a.id==='raven_trap')trap=true;if(a.id==='raven_ult')trap=false;}if(!trap){toast('먼저 좌표 각인으로 함정을 설치하세요.');return;}}if(c.directions||c.target){pending={id};preview={id};renderCommands();renderBoard();}else add({id});}
+function add(a){queue.push(a);pending=null;preview=null;revealed=0;enemyPlan=[];render();ping();}
+function inspect(id){if(playing||pending)return;const c=CARD_MAP[id];preview={id};$('#card-detail').textContent=c.name+' / '+c.cost+' EN / DM '+c.damage+' / GR '+c.glance+' / '+c.description;renderBoard();}
+async function preload(){const ids=Object.entries(ASSETS).filter(([id])=>id.startsWith('vfx/')||id.startsWith('ui/logos/')||id.startsWith('cards/common/')||id==='cards/back'||[selection.player,selection.enemy].some(c=>id.startsWith('characters/'+c+'/')||id.startsWith('cards/'+c+'/')));await Promise.all(ids.map(async([,src])=>{const image=new Image();image.src=src;await image.decode();}));}
+async function banner(id,text,ms=650){$('#stage-banner img').src=asset('ui/logos/'+id);$('#stage-banner img').alt=id.replaceAll('_',' ').toUpperCase();$('#stage-banner strong').textContent=text;$('#stage-banner').hidden=false;await clock.wait(ms);$('#stage-banner').hidden=true;}
+async function begin(){cancel();const token=generation;clock=new PlaybackClock();clock.speed=speed;match=newGame(selection.player,selection.enemy);view=match;queue=[];pending=null;preview=null;enemyPlan=[];revealed=0;showScreen('battle');render();playing=true;renderCommands();phase('LOADING','전장 준비 중...');const overlay=$('#versus-overlay');$('#versus-player').innerHTML='<img src="'+portrait(selection.player,'win')+'" alt=""><strong>'+CHARACTERS[selection.player].name+'</strong>';$('#versus-enemy').innerHTML='<img src="'+portrait(selection.enemy,'win')+'" alt=""><strong>'+CHARACTERS[selection.enemy].name+'</strong>';$('.vs-logo').src=asset('ui/logos/vs');overlay.hidden=false;
+ try{await preload();if(token!==generation)return;await clock.wait(800);overlay.hidden=true;await banner('start','SECTOR 12 / ROUND 1',450);await banner('ready','PLAN YOUR THREE BEATS',450);if(token!==generation)return;playing=false;clock=null;phase('PLANNING','카드 세 장을 예약하세요. 상대의 다음 움직임을 읽어보세요.');render();}catch(error){if(error.name==='AbortError'||token!==generation)return;cancel();navigate('select');toast('전장 리소스를 불러오지 못했습니다. 다시 시도하세요.');console.error(error);}
 }
-function selectCard(id){
- if(playing||match.status==="finished")return;
- if(queue.length>=3){toast("3장의 카드가 모두 예약되었습니다.");return;}
- const c=CARD_MAP[id];
- if(!c.repeat&&queue.some(a=>a.id===id)){toast("이번 라운드에 이미 예약한 카드입니다.");return;}
- if(c.id==="raven_ult"&&!match.trap&&!queue.some(a=>a.id==="raven_trap")){toast("먼저 좌표 각인으로 함정을 설치하세요.");return;}
- if(id!=="focus"&&projectedEN()<c.cost){toast("기력이 부족합니다. 집중 카드를 먼저 사용하세요.");return;}
- if(c.target||c.directions){
-  pending={id};preview={id};render();
-  toast(c.target?"격자의 빈 칸을 클릭해 함정 위치를 지정하세요.":"추가 방향을 선택하세요.");
- }else addToQueue({id});
+function aiPlan(token){return new Promise((resolve,reject)=>{workerReject=reject;worker=new Worker(new URL('./ai-worker.js',import.meta.url),{type:'module'});worker.onmessage=({data})=>{if(token!==generation)return;worker.terminate();worker=null;workerReject=null;if(data.error)reject(Error(data.error));else resolve(data.plan);};worker.onerror=e=>{worker?.terminate();worker=null;workerReject=null;reject(Error(e.message));};worker.postMessage({id:token,state:match,difficulty:selection.difficulty});});}
+async function execute(){if(screen!=='battle'||playing||pending||queue.length!==3)return;const error=validateQueue(match,0,queue);if(error){toast(error);return;}const token=++generation;playing=true;preview=null;clock=new PlaybackClock();clock.speed=speed;revealed=0;enemyPlan=[];render();phase('COMMIT','명령 잠금 / 상대의 전략 계산 중...');
+ try{enemyPlan=await aiPlan(token);if(token!==generation)return;const round=resolveRound(match,[queue,enemyPlan]);for(const frame of round.frames){await playCombatFrame(frame,clock,renderer,{phase,reveal:frame=>{revealed=frame.beat;view={...view,beat:frame.beat};renderHUD();renderEnemy();for(const q of document.querySelectorAll('.queue-slot'))q.classList.toggle('current',Number(q.dataset.remove)===frame.beat-1);},movement:state=>{view=state;renderHUD();},impact:state=>{view=state;renderHUD();renderLog();ping(frame.events.some(e=>e.type==='damage'&&e.actual>0));}});if(token!==generation)return;view=frame.state;renderBoard();}
+ match=round.state;view=match;if(match.status==='finished'){if(match.fighters.some(f=>f.hp===0))await banner('ko','DUEL COMPLETE',750);if(token!==generation)return;showResult();return;}queue=[];enemyPlan=[];revealed=0;await banner(match.round===10?'final_round':'round_start','ROUND '+match.round+' / EN +15',550);if(token!==generation)return;playing=false;clock=null;phase('PLANNING','ROUND '+match.round+' / 다음 세 비트를 예약하세요.');render();
+ }catch(error){if(error.name==='AbortError'||token!==generation)return;console.error(error);playing=false;clock?.cancel();clock=null;view=match;revealed=0;enemyPlan=[];render();phase('PLANNING','실행을 다시 시도하세요.');toast('전투 실행 오류: '+error.message);}
 }
-function addToQueue(action){
- queue.push(action);pending=null;preview=null;revealed=[];enemyPlan=[];playSound("pick");render();
-}
-function previewRange(){
- if(!preview||!view||view.status==="finished")return {direct:[],glance:[]};
- if(preview.id==="raven_trap"&&!preview.target)return {direct:[],glance:[]};
- return rangeAt(view,0,preview);
-}
-function renderOptions(){
- const fig=(key)=>{const c=CHARACTERS[key];return '<button class="hero-choice '+(selection.player===key?"active":"")+'" data-pick-player="'+key+'" style="--accent:'+c.color+'"><img src="'+c.portrait+'" alt=""><span><b>'+c.ko+'</b><small>'+c.role+'</small></span></button>';};
- $("#player-options").innerHTML=Object.keys(CHARACTERS).map(fig).join("");
- const e=CHARACTERS[selection.enemy];
- $("#enemy-choice").innerHTML='<img src="'+e.portrait+'" alt=""><div><b>'+e.ko+'</b><span>'+e.role+'</span></div>';
- $("#enemy-select").innerHTML=Object.entries(CHARACTERS).filter(([id])=>id!==selection.player).map(([id,c])=>'<option value="'+id+'" '+(selection.enemy===id?"selected":"")+'>'+c.ko+' — '+c.role+'</option>').join("");
- $("#difficulty").value=selection.difficulty;
-}
-function renderHUD(){
- for(let i=0;i<2;i++){
-  const f=view.fighters[i],c=who(i),suffix=i===0?"player":"enemy";
-  const name=$("#"+suffix+"-name"),stat=$("#"+suffix+"-stat");
-  name.textContent=c.name+' / '+c.ko;name.style.color=c.color;
-  stat.textContent=f.hp+' / '+MAX_HP+' HP   ·   '+f.en+' / '+MAX_EN+' EN';
-  $("#"+suffix+"-hp").style.width=(f.hp/MAX_HP*100)+"%";
-  $("#"+suffix+"-en").style.width=(f.en/MAX_EN*100)+"%";
-  $("#"+suffix+"-portrait").src=c.portrait;
- }
- $("#round-counter").textContent='ROUND '+view.round+' / 10';
- $("#beat-counter").textContent=playing?'BEAT '+view.beat+' / 3':"NEXT 3 BEATS";
- $("#control-score").textContent=view.score[0]+" : "+view.score[1];
-}
-function renderBoard(){
- const player=view.fighters[0],enemy=view.fighters[1],prev=previewRange(),targeted=pending?.id==="raven_trap";
- let html="";
- for(let y=0;y<3;y++)for(let x=0;x<4;x++){
-  const i=y*4+x,hasPlayer=player.x===x&&player.y===y,hasEnemy=enemy.x===x&&enemy.y===y;
-  const hit=prev.direct.some(p=>p.x===x&&p.y===y)?"direct":prev.glance.some(p=>p.x===x&&p.y===y)?"graze":"";
-  const canTarget=targeted&&dist(player,{x,y})<=2&&!hasPlayer&&!hasEnemy;
-  const trap=view.trap&&view.trap.pos.x===x&&view.trap.pos.y===y;
-  html+='<button class="tile '+(hit?"preview-"+hit:"")+(canTarget?" can-target":"")+'" data-tile="'+x+','+y+'" aria-label="좌표 '+(x+1)+','+(y+1)+'"><span class="tile-label">'+(x+1)+'·'+(y+1)+'</span>'+
-    ((x===1||x===2)&&y===1?'<span class="center-mark">◈</span>':"")+
-    (trap?'<span class="trap-mark" title="설치된 함정">⌗</span>':"")+
-    (hasPlayer?'<span class="unit player-unit" style="--unit:'+who(0).color+'"><img class="unit-sprite" src="'+who(0).portrait+'" alt=""><small>YOU</small></span>':"")+
-    (hasEnemy?'<span class="unit enemy-unit" style="--unit:'+who(1).color+'"><img class="unit-sprite" src="'+who(1).portrait+'" alt=""><small>CPU</small></span>':"")+
-    (canTarget?'<span class="target-cross">+</span>':"")+'</button>';
- }
- $("#board").innerHTML=html;
- $("#board").classList.toggle("targeting",!!targeted);
- $("#arena-caption").textContent=targeted?"좌표 각인: 설치할 타일을 클릭하세요":preview?"예상 사거리 · 이전 행동에 따른 위치 변화는 반영하지 않음":"4 × 3 SECTOR · 가운데 2칸은 동점 시 점령 점수에 반영";
-}
-function cardHTML(c){
- const active=pending?.id===c.id,queued=queue.some(a=>a.id===c.id)&&!c.repeat;
- const available=!queued&&queue.length<3&&!playing&&view.status!=="finished";
- const isCommon=COMMON.includes(c);
- const dmg=c.damage?'<span class="damage-label">DM <b>'+c.damage+'</b> · GR '+c.glance+'</span>':'<span class="damage-label">'+(c.kind==="defense"?"GUARD":c.kind==="energy"?"RECOVER":"MOVE")+'</span>';
- const image=imageFor(c.id);
- return '<button class="skill-card '+(isCommon?"shared":"unique")+" "+(active?"active":"")+'" data-card="'+c.id+'" '+(!available?'disabled':"")+' title="'+escapeHtml(c.description)+'">'+
- '<div class="card-art"><img class="card-illustration" alt="" loading="lazy" src="'+image+'" onerror="this.hidden=true;this.parentNode.classList.add(\'image-missing\')"><span class="card-sigil">'+escapeHtml(c.icon)+'</span></div>'+
- '<div class="card-bottom"><div class="card-title">'+c.name+'</div><span class="en-label">'+c.cost+' EN</span>'+dmg+'<p>'+escapeHtml(c.description)+'</p></div></button>';
-}
-
-function renderCards(){
- const character=match.fighters[0].character;
- $("#common-cards").innerHTML=COMMON.map(cardHTML).join("");
- $("#unique-cards").innerHTML=UNIQUE[character].map(cardHTML).join("");
- $("#unique-heading").textContent=CHARACTERS[character].name+' / 고유 기술';
- $("#queue").innerHTML=Array.from({length:3},(_,i)=>{
-  const a=queue[i],c=a&&CARD_MAP[a.id],detail=a&&(a.direction?' / '+(a.direction==="up"?"↑":a.direction==="down"?"↓":a.direction==="forward"?"→":"←"):a.target?' / '+(a.target.x+1)+','+(a.target.y+1):'');
-  return '<button class="queue-slot '+(a?"filled":"")+'" data-remove="'+i+'" '+(playing?'disabled':"")+'><small>BEAT '+(i+1)+'</small>'+(c?'<span class="queue-card"><img src="'+imageFor(c.id)+'" alt="" onerror="this.hidden=true"><strong>'+c.name+'</strong></span><em>'+detail+'　×</em>':'<span>+ 카드 선택</span>')+'</button>';
- }).join("");
- $("#queue-count").textContent=queue.length+"/3";
- $("#projected-en").textContent="예약 후 예상 EN "+projectedEN()+" / 100";
- $("#execute").disabled=queue.length!==3||playing||match.status==="finished"||!!pending;
- $("#execute").textContent=playing?"실행 중…":match.status==="finished"?"전투 종료":"3비트 실행  ↗";
- $("#hint").textContent=pending?"선택한 기술의 방향 또는 목표를 지정하세요.":queue.length===3?"3비트 실행을 눌러 상대와 동시에 카드를 공개하세요.":"카드를 클릭해 순서대로 세 칸에 배치하세요.";
- const pane=$("#direction-choices");
- if(pending&&CARD_MAP[pending.id].directions){
-  pane.hidden=false;
-  pane.innerHTML='<span class="choice-prompt">'+CARD_MAP[pending.id].name+' 방향</span>'+
-    CARD_MAP[pending.id].directions.map(v=>'<button class="dir-choice" data-dir="'+v+'">'+({up:"↑ 위",down:"↓ 아래",forward:"→ 전진",back:"← 후퇴"}[v])+'</button>').join("")+
-    '<button class="dir-cancel" data-cancel="1">취소</button>';
- }else if(pending&&CARD_MAP[pending.id].target){
-  pane.hidden=false;pane.innerHTML='<span class="choice-prompt">보드에서 목표 타일 선택</span><button class="dir-cancel" data-cancel="1">취소</button>';
- }else {pane.hidden=true;pane.innerHTML="";}
-}
-function revealCard(id,idx,faceDown,flipping){
- const c=id&&CARD_MAP[id];
- const label="BEAT "+(idx+1);
- const back='assets/cards/card_back.png';
- if(faceDown)return '<div class="reveal-card facedown" data-beat="'+idx+'"><img src="'+back+'" alt="비공개 카드 뒷면"><span>'+label+'</span></div>';
- if(!c)return '<div class="reveal-card empty" data-beat="'+idx+'"><span>'+label+'</span><strong>?</strong></div>';
- return '<div class="reveal-card open '+(flipping?'flip':'')+'" data-beat="'+idx+'"><img src="'+imageFor(id)+'" alt="" onerror="this.hidden=true"><div class="reveal-card-text"><b>'+escapeHtml(c.name)+'</b><small>EN '+c.cost+' · DM '+c.damage+'</small></div><span>'+label+'</span></div>';
-}
-function renderReveal(){
- const player=$("#player-reveal"),enemy=$("#enemy-reveal"),msg=$("#reveal-message");
- if(!player||!enemy)return;
- player.innerHTML=Array.from({length:3},(_,i)=>revealCard((playing||enemyPlan.length?playerPlan:queue)[i]?.id,i,false,playing&&revealed.length===i+1)).join("");
- enemy.innerHTML=Array.from({length:3},(_,i)=>revealCard(enemyPlan[i]?.id,i,enemyPlan.length===0||!revealed.includes(i),playing&&revealed[revealed.length-1]===i)).join("");
- msg.textContent=playing?'BEAT '+(revealed.length||1)+' / 3 · 카드 공개 중':enemyPlan.length?'라운드 결과 · 상대의 선택을 확인하세요':'CPU의 행동은 실행될 때까지 비공개입니다';
-}
-function renderLog(){
- $("#combat-log").innerHTML=view.log.slice(0,9).map((s,i)=>'<div class="log-entry '+(i===0?"latest":"")+'"><span>'+escapeHtml(s)+'</span></div>').join("");
- $("#last-event").textContent=playing?'행동 결과 분석 중…':view.status==="finished"?"DUEL COMPLETE":'상대의 다음 행동을 읽어보세요';
-}
-function render(){
- renderOptions();renderHUD();renderBoard();renderCards();renderLog();renderReveal();
- $("#battle-stage").classList.toggle("busy",playing);
- $("#result-panel").hidden=view.status!=="finished";
- if(view.status==="finished"){
-  const winner=view.winner,title=winner===-1?"무승부":winner===0?"승리!":"패배";
-  $("#result-title").textContent=title;
-  $("#result-detail").textContent='HP '+view.fighters[0].hp+' : '+view.fighters[1].hp+
-    '  ·  중앙 점령 '+view.score[0]+' : '+view.score[1];
- }
-}
-async function execute(){
- if(queue.length!==3||playing)return;
- const err=validateQueue(match,0,queue);if(err){toast(err);return;}
- const thisRun=++runToken;playerPlan=structuredClone(queue);revealed=[];enemyPlan=[];
- playing=true;render();
- let opponent,round;
- try{
-  opponent=chooseAI(match,selection.difficulty,1);
-  round=resolveRound(match,[queue,opponent]);
-  enemyPlan=structuredClone(opponent);renderReveal();
- }catch(err){playing=false;toast("실행 오류: "+err.message);render();return;}
- for(const frame of round.frames){
-  await new Promise(ok=>setTimeout(ok,850));
-  if(thisRun!==runToken)return;
-  revealed.push(frame.beat-1);renderReveal();
-  const previous=view;
-  view=frame.state;renderHUD();renderBoard();renderLog();animateBeat(frame,previous);
-  if(frame.events.some(e=>e.type==="hit"&&e.amount>0))playSound("hit");else playSound("tap");
- }
- await new Promise(ok=>setTimeout(ok,450));
- if(thisRun!==runToken)return;
- match=round.state;view=match;queue=[];preview=null;pending=null;playing=false;render();
- if(match.status==="finished")toast(match.winner===0?"섹터 승리!":match.winner===1?"패배. 전술을 다시 검토해보세요.":"무승부.");
- else toast("ROUND "+match.round+" · EN 15 회복");
-}
-function animateBeat(frame,previous){
- const arena=$(".battle-arena");
- arena.classList.remove("impact");
- void arena.offsetWidth;
- const hits=frame.events.filter(e=>e.type==="hit"&&e.amount>0);
- if(hits.length)arena.classList.add("impact");
- for(let i=0;i<2;i++){
-  const unit=$(i===0?".player-unit":".enemy-unit");
-  if(!unit)continue;
-  const before=previous.fighters[i],after=view.fighters[i];
-  if(before.x!==after.x||before.y!==after.y)unit.classList.add("moving");
-  const damage=Math.max(0,before.hp-after.hp);
-  if(damage){
-   unit.classList.add("damaged");
-   const number=document.createElement("span");number.className="damage-float";number.textContent="?"+damage;unit.append(number);
-  }
-  if(frame.events.some(e=>e.type==="guard"&&e.side===i)){
-   const shield=document.createElement("span");shield.className="guard-flash";shield.textContent="GUARD";unit.append(shield);
-  }
- }
- $("#beat-counter").textContent="BEAT "+frame.beat+" / 3";
-}
-function showHelp(){
- $("#help").showModal();
-}
-document.addEventListener("click",e=>{
- const el=e.target.closest("[data-pick-player],[data-card],[data-remove],[data-dir],[data-cancel],[data-tile],[data-action]");
- if(!el)return;
- if(el.dataset.pickPlayer){
-  selection.player=el.dataset.pickPlayer;
-  if(selection.enemy===selection.player)selection.enemy=Object.keys(CHARACTERS).find(v=>v!==selection.player);
-  reset();
- }
- else if(el.dataset.card)selectCard(el.dataset.card);
- else if(el.dataset.remove!==undefined){
-  if(!playing&&queue[Number(el.dataset.remove)]){queue.splice(Number(el.dataset.remove),1);pending=null;preview=null;render();}
- }
- else if(el.dataset.dir&&pending){addToQueue({id:pending.id,direction:el.dataset.dir});}
- else if(el.dataset.cancel){pending=null;preview=null;render();}
- else if(el.dataset.tile&&pending?.id==="raven_trap"){
-  const [x,y]=el.dataset.tile.split(",").map(Number);
-  const choices=options(match,0,pending.id);
-  if(choices.some(a=>a.target.x===x&&a.target.y===y))addToQueue({id:pending.id,target:{x,y}});
-  else toast("시전자 맨해튼 거리 2 이내의 빈 칸만 선택할 수 있습니다.");
- }
- else if(el.dataset.action==="execute")execute();
- else if(el.dataset.action==="reset")reset();
- else if(el.dataset.action==="help")showHelp();
- else if(el.dataset.action==="close-help")$("#help").close();
- else if(el.dataset.action==="sound"){sound=!sound;el.textContent=sound?"♪ 사운드 켬":"♪ 음소거";}
-});
-document.addEventListener("pointerover",e=>{
- if(pending||playing)return;
- const el=e.target.closest("[data-card]");if(!el)return;
- if(preview?.id!==el.dataset.card){preview={id:el.dataset.card};renderBoard();}
-});
-document.addEventListener("pointerout",e=>{
- if(pending||playing)return;
- const el=e.target.closest("[data-card]");if(!el)return;
- if(!el.contains(e.relatedTarget)){preview=null;renderBoard();}
-});
-$("#enemy-select").addEventListener("change",e=>{selection.enemy=e.target.value;reset();});
-$("#difficulty").addEventListener("change",e=>{selection.difficulty=e.target.value;reset();});
-document.addEventListener("keydown",e=>{
- if(e.key==="Escape"&&pending){pending=null;preview=null;render();}
- if(e.key==="Enter"&&queue.length===3&&!playing&&$("#help").open===false){e.preventDefault();execute();}
- if(e.key==="Backspace"&&queue.length&&!playing){queue.pop();render();}
- if(e.key.toLowerCase()==="h"&&e.target.tagName!=="INPUT")showHelp();
-});
-render();
+function showResult(){playing=false;clock?.cancel();clock=null;renderer.clear();renderResult(match);showScreen('result');}
+function setSpeed(value){speed=value;$('#battle-stage').style.setProperty('--playback-speed',speed);if(clock)clock.speed=speed;$('[data-action="speed"]').textContent=speed+'x';$('#speed-option').value=String(speed);}
+function resume(){$('#battle-stage').classList.remove('paused');if(clock)clock.paused=false;$('#pause-dialog').close();}
+function pause(){if(screen!=='battle')return;$('#battle-stage').classList.add('paused');if(clock)clock.paused=true;$('#pause-dialog').showModal();}
+function help(){$('#battle-stage').classList.add('paused');if(clock)clock.paused=true;$('#help').showModal();}
+function closeHelp(){$('#battle-stage').classList.remove('paused');$('#help').close();if(clock)clock.paused=false;}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-action],[data-pick-player],[data-card],[data-remove],[data-dir],[data-tile]');if(!el||el.disabled)return;if(el.matches('a'))e.preventDefault();if(el.dataset.pickPlayer){selection.player=el.dataset.pickPlayer;if(selection.enemy===selection.player)selection.enemy=Object.keys(CHARACTERS).find(c=>c!==selection.player);renderSelection();$('[data-pick-player="'+selection.player+'"]').focus();ping();return;}if(el.dataset.card){selectCard(el.dataset.card);return;}if(el.dataset.remove!==undefined&&!playing){queue.splice(Number(el.dataset.remove),1);pending=null;preview=null;render();return;}if(el.dataset.dir&&pending){add({id:pending.id,direction:el.dataset.dir});return;}if(el.dataset.tile&&pending?.id==='raven_trap'){const [x,y]=el.dataset.tile.split(',').map(Number);if(options(match,0,pending.id).some(a=>a.target.x===x&&a.target.y===y))add({id:pending.id,target:{x,y}});else toast('거리 2 이내의 빈 타일을 선택하세요.');return;}
+ const action=el.dataset.action;if(action==='start'||action==='characters')navigate('select');else if(action==='menu')navigate('menu');else if(action==='fight'||action==='reset')begin();else if(action==='options')$('#options-dialog').showModal();else if(action==='execute')execute();else if(action==='speed')setSpeed(speed===1?2:1);else if(action==='skip'&&clock){clock.skipping=true;clock.paused=false;for(const a of clock.animations)a.finish();}else if(action==='pause')pause();else if(action==='resume')resume();else if(action==='help')help();else if(action==='close-help')closeHelp();else if(action==='cancel-pending'){pending=null;preview=null;render();}});
+document.addEventListener('pointerover',e=>{const el=e.target.closest('[data-card]');if(el)inspect(el.dataset.card);});document.addEventListener('focusin',e=>{const el=e.target.closest('[data-card]');if(el)inspect(el.dataset.card);});document.addEventListener('pointerout',e=>{const el=e.target.closest('[data-card]');if(el&&!el.contains(e.relatedTarget)&&!playing&&!pending){preview=null;renderBoard();}});
+$('#enemy-select').addEventListener('change',e=>selection.enemy=e.target.value);$('#difficulty').addEventListener('change',e=>selection.difficulty=e.target.value);$('#sound-option').addEventListener('change',e=>sound=e.target.checked);$('#speed-option').addEventListener('change',e=>setSpeed(Number(e.target.value)));$('#arena-option').addEventListener('change',e=>$('#battle-stage').style.setProperty('--arena-image','url("'+asset('ui/backgrounds/'+e.target.value)+'")'));
+$('#pause-dialog').addEventListener('cancel',e=>{e.preventDefault();resume();});$('#help').addEventListener('cancel',e=>{e.preventDefault();closeHelp();});document.addEventListener('visibilitychange',()=>{if(document.hidden&&screen==='battle'&&clock&&!$('#pause-dialog').open&&!$('#help').open)pause();});
+document.addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea')||document.querySelector('dialog[open]'))return;if(e.key==='Escape'){if(pending){pending=null;preview=null;render();}else if(screen==='battle')pause();}else if(e.key==='Enter'&&screen==='battle'&&!playing&&queue.length===3&&!e.target.matches('button,a')){e.preventDefault();execute();}else if(e.key==='Backspace'&&screen==='battle'&&!playing){e.preventDefault();queue.pop();pending=null;preview=null;render();}else if(e.key.toLowerCase()==='h')help();});
+renderSelection();showScreen('menu');

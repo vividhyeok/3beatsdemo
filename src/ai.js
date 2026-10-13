@@ -82,7 +82,7 @@ export function chooseAI(state,difficulty="normal",side=1){
   for(const opposition of rivals){
    let result;
    try{
-    result=resolveRound(state,side===0?[candidate,opposition]:[opposition,candidate]).state;
+    result=resolveRound(state,side===0?[candidate,opposition]:[opposition,candidate],{presentation:false}).state;
    }catch{continue;}
    const value=evaluate(result,side);total+=value;
    if(value<min)min=value;

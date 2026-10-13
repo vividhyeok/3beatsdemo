@@ -185,7 +185,7 @@ export function resolveRound(input,queues){
   performMovement(s,moving,ev);
   const rawDamage=[0,0],pushes=[];
   // Environment and traps trigger after movement, before current attacks.
-  if(s.trap&&s.trap.armedRound===s.round&&beat===2){
+  if(s.trap&&s.trap.armedRound===s.round&&beat===2&&!(active[s.trap.owner]&&actions[s.trap.owner].id==="raven_ult")){
    const t=s.trap;rawDamage[1-t.owner]+=explosion(s,t.owner,t.pos,40,20,ev,"좌표 각인");
    s.trap=null;
   }

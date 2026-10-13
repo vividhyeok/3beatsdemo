@@ -49,3 +49,9 @@ node --test tests/*.test.mjs
 ```
 
 For balancing, record side, character matchup, outcome, HP, and unexpected tactical loops. Numbers are initial assumptions and have not been statistically balanced.
+
+## Illustrated card pack (2026-10-13)
+
+The game UI supports image artwork for all 26 unique card IDs using `assets/cards/<character>/<shortname>.webp` and one common card back. Asset names are defined in `src/app.js`. The illustration pack is supplied separately as `three_beats_cards_all_26_ui_assets.zip`; copy the `assets/cards/` folder from that archive to the matching repository directory before packaging a public demo. Card numerical descriptions and hit logic are always derived from `src/game.js`, not the pre-rendered art.
+
+Game-first UI: `index.html` + `game-ui.css`. The previous dashboard remains at `classic.html` for comparison. Do not release the public build before card asset files are installed, and verify the browser smoke test.

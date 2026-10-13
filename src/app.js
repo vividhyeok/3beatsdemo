@@ -11,7 +11,7 @@ const IMAGE_PATHS={
  raven_jab:"raven/jab",raven_push:"raven/push",raven_trap:"raven/trap",raven_ward:"raven/ward",raven_ult:"raven/ult",
  zeta_jab:"zeta/jab",zeta_slide:"zeta/slide",zeta_long:"zeta/long",zeta_brake:"zeta/brake",zeta_ult:"zeta/ult"
 };
-function imageFor(id){return "assets/cards/"+IMAGE_PATHS[id]+".webp";}
+function imageFor(id){return "assets/cards/"+id+".svg";}
 
 const escapeHtml=x=>String(x).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function who(i){return CHARACTERS[view.fighters[i].character];}

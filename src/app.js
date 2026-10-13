@@ -2,7 +2,7 @@ import {CHARACTERS,COMMON,UNIQUE,CARD_MAP,deckOf,newGame,options,rangeAt,validat
 import {chooseAI} from "./ai.js";
 
 let selection={player:"jack",enemy:"eve",difficulty:"normal"};
-let match=newGame(selection.player,selection.enemy),view=match,queue=[],pending=null,preview=null,playing=false,sound=true;
+let match=newGame(selection.player,selection.enemy),view=match,queue=[],pending=null,preview=null,playing=false,sound=true,revealed=[],enemyPlan=[],playerPlan=[],runToken=0;
 const $=sel=>document.querySelector(sel);
 const IMAGE_PATHS={
  forward:"common/forward",back:"common/back",up:"common/up",down:"common/down",guard:"common/guard",focus:"common/focus",
@@ -29,6 +29,7 @@ function playSound(kind="tap"){
 }
 function toast(text){const t=$("#toast");t.textContent=text;t.classList.add("show");clearTimeout(toast.timeout);toast.timeout=setTimeout(()=>t.classList.remove("show"),2300);}
 function reset(){
+ runToken++;revealed=[];enemyPlan=[];playerPlan=[];
  match=newGame(selection.player,selection.enemy);view=match;queue=[];pending=null;preview=null;playing=false;
  render();toast("새 대전이 시작되었습니다.");playSound();
 }
@@ -50,7 +51,7 @@ function selectCard(id){
  }else addToQueue({id});
 }
 function addToQueue(action){
- queue.push(action);pending=null;preview=null;playSound("pick");render();
+ queue.push(action);pending=null;preview=null;revealed=[];enemyPlan=[];playSound("pick");render();
 }
 function previewRange(){
  if(!preview||!view||view.status==="finished")return {direct:[],glance:[]};
@@ -133,12 +134,27 @@ function renderCards(){
   pane.hidden=false;pane.innerHTML='<span class="choice-prompt">보드에서 목표 타일 선택</span><button class="dir-cancel" data-cancel="1">취소</button>';
  }else {pane.hidden=true;pane.innerHTML="";}
 }
+function revealCard(id,idx,faceDown,flipping){
+ const c=id&&CARD_MAP[id];
+ const label="BEAT "+(idx+1);
+ const back='assets/cards/card_back.svg';
+ if(faceDown)return '<div class="reveal-card facedown" data-beat="'+idx+'"><img src="'+back+'" alt="비공개 카드 뒷면"><span>'+label+'</span></div>';
+ if(!c)return '<div class="reveal-card empty" data-beat="'+idx+'"><span>'+label+'</span><strong>?</strong></div>';
+ return '<div class="reveal-card open '+(flipping?'flip':'')+'" data-beat="'+idx+'"><img src="'+imageFor(id)+'" alt="" onerror="this.hidden=true"><div class="reveal-card-text"><b>'+escapeHtml(c.name)+'</b><small>EN '+c.cost+' · DM '+c.damage+'</small></div><span>'+label+'</span></div>';
+}
+function renderReveal(){
+ const player=$("#player-reveal"),enemy=$("#enemy-reveal"),msg=$("#reveal-message");
+ if(!player||!enemy)return;
+ player.innerHTML=Array.from({length:3},(_,i)=>revealCard((playing?playerPlan:queue)[i]?.id,i,false,playing&&revealed.length===i+1)).join("");
+ enemy.innerHTML=Array.from({length:3},(_,i)=>revealCard(enemyPlan[i]?.id,i,enemyPlan.length===0||!revealed.includes(i),playing&&revealed[revealed.length-1]===i)).join("");
+ msg.textContent=playing?'BEAT '+(revealed.length||1)+' / 3 · 카드 공개 중':enemyPlan.length?'라운드 결과 · 상대의 선택을 확인하세요':'CPU의 행동은 실행될 때까지 비공개입니다';
+}
 function renderLog(){
  $("#combat-log").innerHTML=view.log.slice(0,9).map((s,i)=>'<div class="log-entry '+(i===0?"latest":"")+'"><span>'+escapeHtml(s)+'</span></div>').join("");
  $("#last-event").textContent=playing?'행동 결과 분석 중…':view.status==="finished"?"DUEL COMPLETE":'상대의 다음 행동을 읽어보세요';
 }
 function render(){
- renderOptions();renderHUD();renderBoard();renderCards();renderLog();
+ renderOptions();renderHUD();renderBoard();renderCards();renderLog();renderReveal();
  $("#battle-stage").classList.toggle("busy",playing);
  $("#result-panel").hidden=view.status!=="finished";
  if(view.status==="finished"){
@@ -151,18 +167,23 @@ function render(){
 async function execute(){
  if(queue.length!==3||playing)return;
  const err=validateQueue(match,0,queue);if(err){toast(err);return;}
+ const thisRun=++runToken;playerPlan=structuredClone(queue);revealed=[];enemyPlan=[];
  playing=true;render();
  let opponent,round;
  try{
   opponent=chooseAI(match,selection.difficulty,1);
   round=resolveRound(match,[queue,opponent]);
+  enemyPlan=structuredClone(opponent);renderReveal();
  }catch(err){playing=false;toast("실행 오류: "+err.message);render();return;}
  for(const frame of round.frames){
-  await new Promise(ok=>setTimeout(ok,500));
+  await new Promise(ok=>setTimeout(ok,850));
+  if(thisRun!==runToken)return;
+  revealed.push(frame.beat-1);renderReveal();
   view=frame.state;renderHUD();renderBoard();renderLog();
   if(frame.events.some(e=>e.type==="hit"&&e.amount>0))playSound("hit");else playSound("tap");
  }
- await new Promise(ok=>setTimeout(ok,250));
+ await new Promise(ok=>setTimeout(ok,450));
+ if(thisRun!==runToken)return;
  match=round.state;view=match;queue=[];preview=null;pending=null;playing=false;render();
  if(match.status==="finished")toast(match.winner===0?"섹터 승리!":match.winner===1?"패배. 전술을 다시 검토해보세요.":"무승부.");
  else toast("ROUND "+match.round+" · EN 15 회복");

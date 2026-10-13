@@ -1,0 +1,67 @@
+/* THREE BEATS v0.2 - game-facing screen layout. Source card illustrations live in assets/cards. */
+:root{--ink:#080e19;--ice:#a9d6ff;--danger:#f67277}
+body{background:radial-gradient(ellipse at center top,#1b2845 0%,#060b14 78%);font-family:'Noto Sans KR',Inter,Arial,sans-serif}
+.app-shell{max-width:none;box-shadow:none}
+.main-grid{display:flex;flex-direction:column}
+.top-bar{height:67px;position:relative;z-index:5;padding:9px 30px;background:#080e1aeF}
+.top-bar-middle{display:block}
+.sidebar{order:2;min-height:0;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:9px 24px;border:0;border-top:1px solid #34445b}
+.sidebar>.aside-header,.sidebar>.divider,.sidebar>.aside-info,.sidebar>.form-label,.sidebar>.enemy-preview{display:none}
+.hero-options{display:flex;gap:7px}
+.hero-choice{width:125px;height:54px;padding:3px 7px}
+.hero-choice img{width:39px;height:43px}
+.sidebar select{width:180px;height:41px}
+.battle-stage{order:1;display:flex;flex-direction:column;background:#090f1d}
+.battle-header{order:1;position:absolute;left:0;right:0;top:67px;z-index:3;max-width:1500px;margin:auto;background:none;border:none;pointer-events:none;padding:18px 28px;grid-template-columns:1fr 180px 1fr}
+.fighter-hud{background:#0b172acf;border:1px solid #526b874f;padding:8px;border-radius:6px;box-shadow:0 6px 20px #0006;max-width:370px}
+.fighter-hud img{height:65px;width:58px}
+.hud-name{font-size:22px}.round-title{font-size:29px}.vs-badge{display:none}
+.play-content{order:2;display:block;padding:0}
+.battle-arena{min-height:54vh;max-height:660px;height:54vh;border:0;border-bottom:1px solid #394a63;border-radius:0;padding:135px 20px 12px;background:linear-gradient(180deg,#0c1931a0,#172d4b99),url('assets/arena.svg') center/cover}
+.battle-arena:before{opacity:.68}
+.arena-top{display:none}
+.board-container{min-height:0;height:calc(100% - 37px);padding:3px;display:flex;align-items:center}
+.board{width:min(790px,75vw);height: min(300px,34vh);aspect-ratio:auto;transform:perspective(920px) rotateX(12deg);filter:drop-shadow(0 18px 20px #000c)}
+.tile{overflow:visible;border:1px solid #a8c6e682;border-bottom:3px solid #c8e1ff7c;background:linear-gradient(130deg,#7196b750,#1c345385);box-shadow:inset 0 0 20px #a8daff16,0 7px 6px #0007;transition:background .15s}
+.tile .tile-label{color:#aac1dfa0}
+.unit{inset:auto;position:absolute;left:50%;bottom:1px;transform:translateX(-50%) rotateX(-12deg);height:135px;width:95px;background:none;border:0;box-shadow:none;overflow:visible;pointer-events:none}
+.unit:before{content:'';position:absolute;bottom:0;left:5%;width:90%;height:18px;background:var(--unit);filter:blur(9px);opacity:.55}
+.unit-sprite{position:relative;display:block;width:95px;height:130px;object-fit:contain;filter:drop-shadow(0 2px 7px var(--unit));clip-path:polygon(0 0,100% 0,100% 92%,0 92%);animation:actorBreath 2.1s ease-in-out infinite}
+.enemy-unit .unit-sprite{animation-delay:.45s;transform:scaleX(-1)}
+.unit small{position:absolute;bottom:-6px;font-size:9px;letter-spacing:1px;background:#050c17;border:1px solid var(--unit);padding:1px 5px;border-radius:3px}
+.arena-caption{font-size:11px}
+.arena-legend{margin:0}
+.tactical-panel{position:absolute;right:30px;top:210px;z-index:4;width:min(280px,23vw);min-height:180px;max-height:220px;overflow:hidden;padding:11px;background:#0c1524d9;border:1px solid #445674a0}
+.tactical-panel .panel-top h3{font-size:15px}.tactical-panel .last-event{padding:7px;margin:8px 0}
+.tactical-panel .combat-log{max-height:75px}.tactical-panel .micro-info{display:none}
+.hand-section{order:4;border-top:0;padding:13px 22px;background:#0f1727}
+.hand-head{margin-bottom:9px}
+.hand-head h2{font-size:16px}
+.cards{gap:9px}
+.cards.six{grid-template-columns:repeat(6,minmax(0,1fr))}
+.cards.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.skill-card{border-radius:7px;min-width:0;min-height:180px;transition:transform .14s,border-color .14s,box-shadow .14s}
+.skill-card:hover:not(:disabled){transform:translateY(-11px) scale(1.03);z-index:10}
+.skill-card.active{border-color:#faf2b2;box-shadow:0 0 20px #eabc7363}
+.card-art{height:120px;overflow:hidden;flex:none;position:relative;background:linear-gradient(160deg,#12375b,#101726)}
+.card-art:before,.card-art:after{display:none}
+.card-illustration{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;display:block}
+.card-sigil{position:absolute;inset:0;display:none;align-items:center;justify-content:center}
+.card-art.image-missing .card-sigil{display:flex}
+.card-bottom{min-height:74px;padding:8px}
+.card-title{font-size:13px;letter-spacing:-.2px}
+.card-bottom p{display:none}
+.card-bottom .damage-label{font-size:12px}
+.card-bottom .en-label{font-size:12px}
+.queue-wrap{order:3;padding:11px 22px 13px;background:#121d30;border-top:1px solid #53637c}
+.queue-main{grid-template-columns:1fr 185px}
+.queue-slot{min-height:74px}
+.queue-slot .queue-card{display:flex;gap:10px;align-items:center;overflow:hidden}
+.queue-card img{width:52px;height:45px;object-fit:cover;flex-shrink:0;border-radius:3px;border:1px solid #8eb9d6}
+.queue-card strong{white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.queue-title h2{font-size:15px;margin-bottom:3px}
+.queue-title p{font-size:10px}
+.footer{display:none}
+@keyframes actorBreath{0%,100%{translate:0 0}50%{translate:0 -5px}}
+@media(max-width:1100px){.top-bar-middle{display:none}.battle-arena{height:48vh;min-height:370px}.tactical-panel{display:none}.board{width:min(790px,90vw)}}
+@media(max-width:700px){.top-bar{padding:10px}.battle-header{top:70px;grid-template-columns:1fr 115px 1fr;padding:12px 8px}.fighter-hud img{width:35px;height:46px}.hud-name{font-size:13px}.stat-line{font-size:9px}.round-title{font-size:17px}.battle-arena{height:415px;min-height:415px;padding:150px 8px 8px}.board{height:205px;width:94vw}.unit,.unit-sprite{height:85px;width:65px}.sidebar{padding:9px 5px;gap:5px}.hero-choice{width:80px;height:51px}.hero-choice img{width:26px;height:37px}.hero-choice span small{display:none}.sidebar select{width:130px}.hand-section{padding:10px 6px}.cards.six,.cards.five{display:flex;grid-template-columns:none;overflow-x:auto;scrollbar-width:thin}.skill-card{min-width:129px}.card-art{height:91px}.queue-wrap{padding:10px 6px}.queue-main{display:block}.submit-area{margin-top:8px}.queue-card img{width:38px;height:32px}.queue-slot{padding:4px;min-height:61px}.queue-slot span{font-size:10px}}

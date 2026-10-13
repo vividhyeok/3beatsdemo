@@ -1,118 +1,90 @@
 <!doctype html>
 <html lang="ko">
 <head>
- <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
- <meta name="theme-color" content="#070b14">
- <meta name="description" content="THREE BEATS: SECTOR 12 | 세 번의 선택, 단 한 번의 승부. 실시간 연출의 전술 대전 데모.">
- <title>THREE BEATS — SECTOR 12 | PLAY</title>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta name="theme-color" content="#101421">
+ <meta name="description" content="THREE BEATS: SECTOR 12 — 4×3 격자에서 벌어지는 3비트 동시 예약 전략 격투 게임 데모">
+ <title>THREE BEATS — SECTOR 12 · COMBAT DEMO</title>
  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="game-ui.css">
 </head>
 <body>
- <div class="game-shell">
+ <div class="app-shell">
   <header class="top-bar">
-   <div class="brand"><span class="brand-mark">Ⅲ<span>✕</span></span><div><strong>THREE <em>BEATS</em></strong><small>SECTOR 12 · PLAYTEST BUILD</small></div></div>
-   <div class="header-center"><span class="online-dot"></span> SECTOR LINK STABLE <span class="slash">/</span> 01 VS CPU</div>
-   <nav class="top-actions">
-    <button class="header-btn" data-action="roster">◈ <span>캐릭터 선택</span></button>
-    <button class="header-btn" data-action="help">? <span>조작 안내</span></button>
-    <button class="header-btn" data-action="sound">♪ <span>사운드 켬</span></button>
-    <button class="header-btn dangerous" data-action="reset">↻ <span>다시 시작</span></button>
-   </nav>
+   <div class="brand">
+    <div class="brand-icon">Ⅲ<span>↯</span></div>
+    <div><div class="brand-title">THREE <strong>BEATS</strong></div><div class="brand-sub">SECTOR 12 <i>·</i> COMBAT PROTOTYPE</div></div>
+   </div>
+   <div class="top-bar-middle"><span class="status-led"></span> SIMULTANEOUS TACTICS <span class="meta-divider">/</span> BUILD 0.1.0</div>
+   <div class="top-actions"><button data-action="sound" class="secondary-btn sound-btn">♪ 사운드 켬</button><button data-action="help" class="secondary-btn">? 게임 방법</button><button data-action="reset" class="primary-outline">↻ 새 대전</button></div>
   </header>
-
-  <div class="play-root">
-   <section class="battle-stage" id="battle-stage" aria-label="메인 전투">
-    <div class="arena-world">
-     <div class="world-environment" aria-hidden="true"></div>
-     <div class="world-vignette" aria-hidden="true"></div>
-     <div class="world-scanlines" aria-hidden="true"></div>
-     <div class="arena-heading">
-      <span class="arena-kicker">COMBAT ZONE // 12</span>
-      <div class="round-badge"><span id="round-counter">ROUND 1 / 10</span><small id="beat-counter">NEXT 3 BEATS</small></div>
-      <span class="arena-kicker">CENTRAL CONTROL <b id="control-score">0 : 0</b></span>
+  <main class="main-grid">
+   <aside class="sidebar">
+    <div class="aside-header"><span class="eyebrow">01 / LOADOUT</span><h2>파이터 선택</h2><p>전투 스타일을 선택하세요.</p></div>
+    <div id="player-options" class="hero-options"></div>
+    <div class="divider"></div>
+    <div class="aside-header"><span class="eyebrow">02 / OPPONENT</span><h2>상대 설정</h2></div>
+    <div id="enemy-choice" class="enemy-preview"></div>
+    <label class="form-label" for="enemy-select">상대 캐릭터</label>
+    <select id="enemy-select"></select>
+    <label class="form-label" for="difficulty">AI 난이도</label>
+    <select id="difficulty"><option value="easy">EASY · 탐색형</option><option value="normal">NORMAL · 계산형</option><option value="expert">EXPERT · 심리형</option></select>
+    <div class="aside-info"><span class="eyebrow">SIMULATION RULES</span><p>무작위 드로우 · 명중 확률 · 치명타가 없습니다.</p><p>상대 AI는 예약한 내 카드를 읽지 않고 공개 정보만 사용합니다.</p></div>
+   </aside>
+   <section class="battle-stage" id="battle-stage">
+    <div class="battle-header">
+     <div class="fighter-hud friendly">
+      <img id="player-portrait" src="assets/jack.svg" alt="">
+      <div class="hud-bars"><div class="hud-name" id="player-name">JACK</div><div class="stat-line" id="player-stat"></div><div class="meter hp-meter"><span id="player-hp"></span></div><div class="meter en-meter"><span id="player-en"></span></div></div>
      </div>
-
-     <div class="combat-huds">
-      <div class="fighter-hud player-hud">
-       <img id="player-portrait" src="assets/jack.svg" alt="플레이어 캐릭터">
-       <div class="hud-content"><span class="fighter-tag">PLAYER 01</span><strong id="player-name">JACK / 잭</strong><span id="player-stat" class="stat-line">120 / 120 HP · 45 EN</span>
-        <div class="hud-meter hp"><span id="player-hp"></span></div><div class="hud-meter energy"><span id="player-en"></span></div>
-       </div>
-      </div>
-      <div class="fighter-hud opponent-hud">
-       <div class="hud-content"><span class="fighter-tag">ENEMY / A.I.</span><strong id="enemy-name">EVE / 이브</strong><span id="enemy-stat" class="stat-line">120 / 120 HP · 45 EN</span>
-        <div class="hud-meter hp"><span id="enemy-hp"></span></div><div class="hud-meter energy"><span id="enemy-en"></span></div>
-       </div>
-       <img id="enemy-portrait" src="assets/eve.svg" alt="상대 캐릭터">
-      </div>
-     </div>
-
-     <div class="battleground">
-      <div class="battleground-aura"></div>
-      <div id="board" class="board" aria-label="4x3 전투 격자"></div>
-      <div id="board-fx" class="board-fx" aria-live="off"></div>
-      <div id="battle-flash" class="battle-flash"></div>
-      <div class="board-topline"><span>12 TILE ARENA</span><span class="field-mark">NO RANDOM HITS</span></div>
-      <div class="board-baseline"><span id="arena-caption">전장을 읽고 다음 세 행동을 계획하세요</span></div>
-     </div>
-
-     <div class="action-announcer" id="action-announcer" aria-live="polite">
-      <div class="announce-side announce-player"><small>PLAYER</small><b id="announce-player">대기 중</b></div>
-      <div class="announce-center"><strong id="announce-beat">BEAT 01</strong><small>SIMULTANEOUS RESOLVE</small></div>
-      <div class="announce-side announce-enemy"><small>ENEMY</small><b id="announce-enemy">???</b></div>
-     </div>
-     <div class="arena-status"><span class="arena-status-text" id="last-event">세 장의 카드를 조합해 상대의 행동을 읽으세요</span><span class="arena-legend"><span><i class="chip red"></i>직격</span><span><i class="chip amber"></i>스침</span><span><i class="chip violet"></i>함정</span></span></div>
-    </div>
-
-    <div class="command-center">
-     <div class="section-topline"><span class="eyebrow">01 / TACTICAL COMMAND</span><div class="command-switch"><button class="tab-btn active" data-tab="all">ALL 11</button><button class="tab-btn" data-tab="common">공용 6</button><button class="tab-btn" data-tab="unique">고유 5</button></div><span class="mini-help">카드를 눌러 행동 예약 · 마우스를 올리면 공격 범위</span></div>
-     <div class="cards-wrapper" id="cards-wrapper">
-      <div class="deck-section common-section"><div class="deck-label"><span>COMMON MOVES</span><small>이동 · 방어 · 기력</small></div><div class="cards common-cards" id="common-cards"></div></div>
-      <div class="deck-section unique-section"><div class="deck-label"><span id="unique-heading">JACK / 고유 기술</span><small>공격 · 변칙 · 필살</small></div><div class="cards unique-cards" id="unique-cards"></div></div>
-     </div>
-     <div class="queue-zone">
-      <div class="queue-info"><span class="eyebrow">02 / ACTION PROGRAM</span><h2>다음 세 행동 <span id="queue-count">0/3</span></h2><p id="hint">순서대로 세 장을 골라주세요.</p></div>
-      <div id="direction-choices" class="direction-choices" hidden></div>
-      <div class="queue-layout"><div id="queue" class="queue-slots"></div>
-       <div class="execution-control"><span id="projected-en">예상 EN 45 / 100</span><button id="execute" class="execute-btn" data-action="execute" disabled>3비트 실행 <i>▶</i></button></div>
-      </div>
+     <div class="fight-heading"><div id="round-counter" class="round-title">ROUND 1 / 10</div><div id="beat-counter" class="beat-title">NEXT 3 BEATS</div><div class="vs-badge">VS</div></div>
+     <div class="fighter-hud hostile">
+      <div class="hud-bars"><div class="hud-name" id="enemy-name">EVE</div><div class="stat-line" id="enemy-stat"></div><div class="meter hp-meter"><span id="enemy-hp"></span></div><div class="meter en-meter"><span id="enemy-en"></span></div></div>
+      <img id="enemy-portrait" src="assets/eve.svg" alt="">
      </div>
     </div>
-    <div class="bottom-bar"><div><span class="pulse-dot"></span> <span id="battle-status">PLAYER ACTION REQUIRED</span></div><button data-action="log" class="log-toggle">전투 기록 ▤</button><span>THREE BEATS · INTERNAL GAMEPLAY DEMO</span></div>
+    <div class="play-content">
+     <div class="battle-arena">
+      <div class="arena-top"><span>SECTOR 12 <span class="red-dot">●</span></span><span>CONTROL <b id="control-score">0 : 0</b></span></div>
+      <div class="board-container"><div id="board" class="board" aria-label="4 x 3 전투 격자"></div></div>
+      <div class="arena-caption" id="arena-caption"></div>
+      <div class="arena-legend"><span><i class="legend-square direct"></i> 직격</span><span><i class="legend-square graze"></i> 스침</span><span><i class="legend-square trap"></i> 설치 함정</span></div>
+     </div>
+     <div class="tactical-panel">
+      <div class="panel-top"><div><span class="eyebrow">COMBAT INTELLIGENCE</span><h3>전투 분석</h3></div><span class="live-pill">● LIVE</span></div>
+      <p id="last-event" class="last-event">상대의 다음 행동을 읽어보세요</p>
+      <div class="panel-divider"></div>
+      <div class="log-heading">EVENT TIMELINE <span>최신 순</span></div>
+      <div id="combat-log" class="combat-log" aria-live="polite"></div>
+      <div class="micro-info">상대의 비공개 행동은 실행 시점에만 공개됩니다.</div>
+     </div>
+    </div>
+    <div class="hand-section">
+     <div class="hand-head"><div><span class="eyebrow">03 / COMMAND DECK</span><h2>행동 카드 <span>11 TYPES / NO DRAWS</span></h2></div><span class="hand-tip">카드에 마우스를 올리면 예상 범위 표시</span></div>
+     <div class="deck-label"><span>SHARED COMMANDS</span><em>6장 / 모든 캐릭터 공용</em></div>
+     <div id="common-cards" class="cards six"></div>
+     <div class="deck-label unique-label"><span id="unique-heading">JACK / 고유 기술</span><em>5장 / 캐릭터 고유</em></div>
+     <div id="unique-cards" class="cards five"></div>
+    </div>
+    <div class="queue-wrap">
+     <div class="queue-title"><span class="eyebrow">04 / PROGRAM ACTIONS</span><h2>3비트 예약 <span id="queue-count">0/3</span></h2><p id="hint">카드를 클릭해 순서대로 세 칸에 배치하세요.</p></div>
+     <div id="direction-choices" class="direction-choices" hidden></div>
+     <div class="queue-main"><div id="queue" class="queue-slots"></div><div class="submit-area"><div id="projected-en">예약 후 예상 EN 45 / 100</div><button id="execute" data-action="execute" class="execute-btn" disabled>3비트 실행 ↗</button></div></div>
+    </div>
+    <footer class="footer"><span>THREE BEATS / SECTOR 12</span><span>PLAYTEST BUILD · ALL NUMBERS SUBJECT TO BALANCE</span></footer>
    </section>
-  </div>
+  </main>
  </div>
-
- <aside id="roster-panel" class="drawer" hidden aria-label="캐릭터 선택">
-  <div class="drawer-backdrop" data-action="close-roster"></div>
-  <div class="drawer-content"><div class="drawer-title"><span class="eyebrow">SECTOR LOADOUT</span><button data-action="close-roster" aria-label="창 닫기">✕</button></div><h2>캐릭터 선택</h2><p>캐릭터와 AI의 전투 스타일을 설정하세요. 변경하면 새로운 경기가 시작됩니다.</p><div id="player-options" class="hero-options"></div>
-   <div class="drawer-divider"></div><div class="drawer-title"><span class="eyebrow">OPPONENT CONFIG</span></div><div id="enemy-choice" class="enemy-preview"></div>
-   <label class="form-label" for="enemy-select">상대 캐릭터</label><select id="enemy-select"></select>
-   <label class="form-label" for="difficulty">AI 난이도</label><select id="difficulty"><option value="easy">EASY · 입문</option><option value="normal">NORMAL · 표준</option><option value="expert">EXPERT · 고수</option></select>
-   <button class="drawer-done" data-action="close-roster">전장으로 돌아가기 →</button>
-  </div>
- </aside>
-
- <aside id="log-panel" class="drawer" hidden aria-label="전투 기록">
-  <div class="drawer-backdrop" data-action="close-log"></div>
-  <div class="drawer-content"><div class="drawer-title"><span class="eyebrow">COMBAT ARCHIVE</span><button data-action="close-log" aria-label="창 닫기">✕</button></div><h2>전투 기록</h2><p>현재 대전에서 공개된 비트와 피해 내역</p><div id="combat-log" class="combat-log"></div></div>
- </aside>
-
  <div id="toast" class="toast" role="status"></div>
- <div id="result-panel" class="result-overlay" hidden>
-  <div class="result-card"><span class="eyebrow">SIMULATION COMPLETE</span><div class="result-symbol">✦</div><h2 id="result-title">승리!</h2><p id="result-detail">120 : 0</p><button data-action="reset" class="execute-btn">다시 대전하기 ▶</button><button data-action="roster" class="result-secondary">다른 캐릭터 선택</button></div>
- </div>
- <dialog id="help" class="help-dialog">
-  <div class="dialog-top"><div><span class="eyebrow">PILOT'S MANUAL</span><h2>플레이 방법</h2></div><button data-action="close-help">✕</button></div>
-  <div class="help-body">
-   <h3>① 세 번의 행동을 미리 예약</h3><p>아래 카드 11종 중 3장을 순서대로 선택하세요. 게임은 플레이어와 AI의 세 행동을 비밀리에 예약한 뒤, BEAT 1·2·3 순서로 동시에 해결합니다. 실행 중 카드를 바꿀 수 없습니다.</p>
-   <h3>② 진짜 전투는 위치 싸움</h3><p>4×3 전장에서 이동이 먼저, 공격이 나중입니다. 타격 범위 중앙이면 직격, 외곽이면 스침, 벗어나면 회피합니다. 운에 의한 명중 실패나 치명타는 없습니다.</p>
-   <h3>③ 카드 관리와 방향</h3><p>공용 6종(전진·후퇴·위·아래·방어·집중) + 고유 5종입니다. 방향을 고르는 기술은 버튼으로 방향을 정하고, 레이븐 함정은 전장의 타일을 직접 클릭해 지정합니다. 반복 이동은 가능하지만 다른 카드는 라운드당 한 번입니다.</p>
-   <h3>④ HP·EN과 승리</h3><p>HP 120 / 시작 EN 45입니다. 집중은 EN +30, 라운드 종료 시 +15, 방어는 피해를 30 줄입니다. 상대의 HP를 먼저 0으로 만들면 승리하며, 10라운드 종료 시 HP와 중앙 점령 점수를 비교합니다.</p>
-  </div>
-  <button data-action="close-help" class="drawer-done">전투 시작하기 →</button>
- </dialog>
+ <div id="result-panel" class="result-overlay" hidden><div class="result-card"><span class="eyebrow">SECTOR 12 / MATCH SUMMARY</span><h2 id="result-title">승리!</h2><p id="result-detail"></p><button class="execute-btn" data-action="reset">다시 대전하기 →</button></div></div>
+ <dialog id="help" class="help-dialog"><div class="dialog-head"><div><span class="eyebrow">OPERATIONS MANUAL</span><h2>3비트 전투 가이드</h2></div><button data-action="close-help" class="close-dialog" aria-label="닫기">✕</button></div>
+  <div class="help-body"><h3>1. 3장을 먼저 선택하세요</h3><p>양 플레이어가 비밀리에 행동 3개를 예약한 후 BEAT 1 → 2 → 3 순서대로 동시에 해결됩니다. 중간에 계획을 바꿀 수 없습니다.</p>
+  <h3>2. 이동 후 공격을 판정합니다</h3><p>양쪽이 동시에 이동하고 충돌을 처리한 다음 새 위치를 기준으로 공격합니다. 붉은 타일은 직격, 황금색은 스침, 나머지는 빗나감입니다. 명중은 100% 결정적입니다.</p>
+  <h3>3. 기력과 공용 카드</h3><p>HP는 120, EN은 45로 시작합니다. 집중 +30 EN, 라운드 종료 +15 EN, 방어는 해당 비트 피해 -30입니다. 공용 이동은 반복할 수 있지만 집중/방어/고유 기술은 라운드당 한 번만 쓸 수 있습니다.</p>
+  <h3>4. 특수 기술</h3><p>제타 기술 일부는 방향을 골라야 합니다. 레이븐의 좌표 각인은 격자에서 설치 위치를 선택하고 다음 라운드 BEAT 2에 폭발합니다. 과부하로 조기 폭발할 수 있습니다.</p>
+  <h3>5. 승리 조건</h3><p>상대 HP가 0이 되면 승리. 10라운드 제한을 넘기면 HP 우세, 이후 중앙 칸 점령 점수로 결정합니다. 양쪽 HP가 동시에 0이면 무승부입니다.</p></div>
+  <button data-action="close-help" class="primary-outline dialog-confirm">이해했어요</button></dialog>
  <script type="module" src="src/app.js"></script>
 </body>
 </html>

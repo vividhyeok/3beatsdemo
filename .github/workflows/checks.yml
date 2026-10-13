@@ -1,0 +1,28 @@
+name: Demo checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test battle simulation
+        run: node --test tests/*.test.mjs
+      - name: Verify static demo resources
+        run: |
+          test -f index.html
+          test -f style.css
+          test -f src/app.js
+          test -f src/game.js
+          test -f src/ai.js
+          test -f assets/jack.svg
+          test -f assets/eve.svg
+          test -f assets/raven.svg
+          test -f assets/zeta.svg

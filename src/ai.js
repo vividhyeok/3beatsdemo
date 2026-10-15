@@ -9,6 +9,7 @@ function point(s,side,action,previous=[],history=null){
  let w=1;
  if(c.id==="focus")w=f.en<22?7:f.en<45?3:.6;
  else if(c.id==="guard")w=distance<=2?2.4:0.5;
+ else if(c.id==="raven_ward")w=distance<=3?3.4:0.7;
  else if(c.id==="forward")w=dx>=2?4:1.4;
  else if(c.id==="back")w=dx===1?2.0:.8;
  else if(c.id==="up"||c.id==="down"){const ny=f.y+(c.id==="up"?-1:1);w=inside(f.x,ny)?1.5:.12;}

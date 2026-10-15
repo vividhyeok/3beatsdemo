@@ -23,3 +23,11 @@ test('EVE piercing shot grazes adjacent enemies; RAVEN can mark distant cells',(
  const trap=newGame('raven','eve');assert.ok(options(trap,0,'raven_trap').some(a=>a.target.x===2&&a.target.y===0));
  assert.equal(CARD_MAP.raven_trap.cost,15);
 });
+test('RAVEN ward counters a ranged attack but does not fire at a resting enemy',()=>{
+ const s=newGame('raven','eve');s.fighters[0].x=0;s.fighters[1].x=2;
+ const attacked=resolveRound(s,[q('raven_ward','focus','guard'),q('eve_pierce','focus','back')]).frames[0];
+ assert.equal(attacked.state.fighters[1].hp,100);
+ assert.equal(attacked.state.fighters[0].hp,110);
+ const quiet=resolveRound(s,[q('raven_ward','focus','guard'),q('guard','focus','back')]).frames[0];
+ assert.equal(quiet.state.fighters[1].hp,120);
+});

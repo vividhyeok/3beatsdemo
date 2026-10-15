@@ -11,7 +11,7 @@
     "response",
     "random"
   ],
-  "gamesPerPair": 36,
+  "gamesPerPair": 324,
   "oneBeat": {
     "positions": 132,
     "cardPairs": 406344,
@@ -63,7 +63,7 @@
       "raven_jab": 96,
       "raven_push": 120,
       "raven_trap": 1168,
-      "raven_ward": 0,
+      "raven_ward": 72,
       "raven_ult": 0,
       "zeta_jab": 96,
       "zeta_slide": 192,
@@ -91,7 +91,7 @@
       "raven_jab": 360,
       "raven_push": 288,
       "raven_trap": 3312,
-      "raven_ward": 392,
+      "raven_ward": 320,
       "raven_ult": 528,
       "zeta_jab": 360,
       "zeta_slide": 720,
@@ -119,7 +119,7 @@
       "raven_jab": 1176,
       "raven_push": 1824,
       "raven_trap": 17520,
-      "raven_ward": 1496,
+      "raven_ward": 2144,
       "raven_ult": 0,
       "zeta_jab": 1176,
       "zeta_slide": 2352,
@@ -130,132 +130,132 @@
   },
   "matchups": {
     "jack-vs-jack": {
-      "games": 36,
-      "wins": 17,
-      "draws": 2,
+      "games": 324,
+      "wins": 158,
+      "draws": 8,
       "scoreRate": 0.5,
-      "hpDifference": -3.75,
-      "ci95HalfWidth": 0.16333333333333333
+      "hpDifference": 0.9259259259259259,
+      "ci95HalfWidth": 0.05444444444444444
     },
     "jack-vs-eve": {
-      "games": 36,
-      "wins": 9,
-      "draws": 1,
-      "scoreRate": 0.2638888888888889,
-      "hpDifference": -33.47222222222222,
-      "ci95HalfWidth": 0.14397499092194427
+      "games": 324,
+      "wins": 109,
+      "draws": 17,
+      "scoreRate": 0.3626543209876543,
+      "hpDifference": -26.496913580246915,
+      "ci95HalfWidth": 0.0523501002091032
     },
     "jack-vs-raven": {
-      "games": 36,
-      "wins": 16,
-      "draws": 1,
-      "scoreRate": 0.4583333333333333,
-      "hpDifference": -12.777777777777779,
-      "ci95HalfWidth": 0.16276521566999125
+      "games": 324,
+      "wins": 149,
+      "draws": 17,
+      "scoreRate": 0.4861111111111111,
+      "hpDifference": 1.6820987654320987,
+      "ci95HalfWidth": 0.05442343558993102
     },
     "jack-vs-zeta": {
-      "games": 36,
-      "wins": 18,
-      "draws": 0,
+      "games": 324,
+      "wins": 156,
+      "draws": 12,
       "scoreRate": 0.5,
-      "hpDifference": -13.472222222222221,
-      "ci95HalfWidth": 0.16333333333333333
+      "hpDifference": 3.2098765432098766,
+      "ci95HalfWidth": 0.05444444444444444
     },
     "eve-vs-jack": {
-      "games": 36,
-      "wins": 21,
-      "draws": 0,
-      "scoreRate": 0.5833333333333334,
-      "hpDifference": 22.916666666666668,
-      "ci95HalfWidth": 0.161048838539934
+      "games": 324,
+      "wins": 199,
+      "draws": 12,
+      "scoreRate": 0.6327160493827161,
+      "hpDifference": 26.265432098765434,
+      "ci95HalfWidth": 0.052491498054316243
     },
     "eve-vs-eve": {
-      "games": 36,
-      "wins": 15,
-      "draws": 4,
-      "scoreRate": 0.4722222222222222,
-      "hpDifference": 3.888888888888889,
-      "ci95HalfWidth": 0.16308108093054816
+      "games": 324,
+      "wins": 141,
+      "draws": 40,
+      "scoreRate": 0.49691358024691357,
+      "hpDifference": 0.1697530864197531,
+      "ci95HalfWidth": 0.05444340716043493
     },
     "eve-vs-raven": {
-      "games": 36,
-      "wins": 24,
-      "draws": 0,
-      "scoreRate": 0.6666666666666666,
-      "hpDifference": 31.38888888888889,
-      "ci95HalfWidth": 0.1539921434584037
+      "games": 324,
+      "wins": 201,
+      "draws": 11,
+      "scoreRate": 0.6373456790123457,
+      "hpDifference": 27.22222222222222,
+      "ci95HalfWidth": 0.05235010020910319
     },
     "eve-vs-zeta": {
-      "games": 36,
-      "wins": 18,
-      "draws": 1,
-      "scoreRate": 0.5138888888888888,
-      "hpDifference": 16.52777777777778,
-      "ci95HalfWidth": 0.16327030676979307
+      "games": 324,
+      "wins": 189,
+      "draws": 4,
+      "scoreRate": 0.5895061728395061,
+      "hpDifference": 16.064814814814813,
+      "ci95HalfWidth": 0.05356499394478451
     },
     "raven-vs-jack": {
-      "games": 36,
-      "wins": 20,
-      "draws": 1,
-      "scoreRate": 0.5694444444444444,
-      "hpDifference": 3.0555555555555554,
-      "ci95HalfWidth": 0.1617503018571886
+      "games": 324,
+      "wins": 165,
+      "draws": 11,
+      "scoreRate": 0.5262345679012346,
+      "hpDifference": 3.3487654320987654,
+      "ci95HalfWidth": 0.05436944973780555
     },
     "raven-vs-eve": {
-      "games": 36,
-      "wins": 11,
-      "draws": 1,
-      "scoreRate": 0.3194444444444444,
-      "hpDifference": -36.80555555555556,
-      "ci95HalfWidth": 0.1523120567126169
+      "games": 324,
+      "wins": 118,
+      "draws": 6,
+      "scoreRate": 0.3734567901234568,
+      "hpDifference": -27.77777777777778,
+      "ci95HalfWidth": 0.052671933412138064
     },
     "raven-vs-raven": {
-      "games": 36,
-      "wins": 21,
-      "draws": 1,
-      "scoreRate": 0.5972222222222222,
-      "hpDifference": 0.1388888888888889,
-      "ci95HalfWidth": 0.16021587695693876
+      "games": 324,
+      "wins": 158,
+      "draws": 3,
+      "scoreRate": 0.49228395061728397,
+      "hpDifference": 0.5092592592592593,
+      "ci95HalfWidth": 0.054437961095117914
     },
     "raven-vs-zeta": {
-      "games": 36,
-      "wins": 13,
-      "draws": 1,
-      "scoreRate": 0.375,
-      "hpDifference": -11.11111111111111,
-      "ci95HalfWidth": 0.1581468199701362
+      "games": 324,
+      "wins": 160,
+      "draws": 6,
+      "scoreRate": 0.5030864197530864,
+      "hpDifference": 1.0493827160493827,
+      "ci95HalfWidth": 0.05444340716043493
     },
     "zeta-vs-jack": {
-      "games": 36,
-      "wins": 18,
-      "draws": 0,
-      "scoreRate": 0.5,
-      "hpDifference": 7.222222222222222,
-      "ci95HalfWidth": 0.16333333333333333
+      "games": 324,
+      "wins": 156,
+      "draws": 11,
+      "scoreRate": 0.4984567901234568,
+      "hpDifference": -1.4814814814814814,
+      "ci95HalfWidth": 0.05444418512529481
     },
     "zeta-vs-eve": {
-      "games": 36,
-      "wins": 15,
-      "draws": 3,
-      "scoreRate": 0.4583333333333333,
-      "hpDifference": -13.75,
-      "ci95HalfWidth": 0.16276521566999125
+      "games": 324,
+      "wins": 130,
+      "draws": 2,
+      "scoreRate": 0.404320987654321,
+      "hpDifference": -14.783950617283951,
+      "ci95HalfWidth": 0.05343832764064373
     },
     "zeta-vs-raven": {
-      "games": 36,
-      "wins": 15,
-      "draws": 2,
-      "scoreRate": 0.4444444444444444,
-      "hpDifference": -10.277777777777779,
-      "ci95HalfWidth": 0.16232197169998472
+      "games": 324,
+      "wins": 149,
+      "draws": 8,
+      "scoreRate": 0.4722222222222222,
+      "hpDifference": -1.0802469135802468,
+      "ci95HalfWidth": 0.054360360310182716
     },
     "zeta-vs-zeta": {
-      "games": 36,
-      "wins": 12,
-      "draws": 2,
-      "scoreRate": 0.3611111111111111,
-      "hpDifference": -7.083333333333333,
-      "ci95HalfWidth": 0.15690540867106267
+      "games": 324,
+      "wins": 146,
+      "draws": 17,
+      "scoreRate": 0.47685185185185186,
+      "hpDifference": 0.15432098765432098,
+      "ci95HalfWidth": 0.05438606647688879
     }
   },
   "cards": [
@@ -434,10 +434,10 @@
       "id": "raven_ward",
       "cost": 20,
       "damage": 30,
-      "glance": 0,
+      "glance": 20,
       "direct": 136,
-      "graze": 0,
-      "miss": 392
+      "graze": 72,
+      "miss": 320
     },
     {
       "id": "raven_ult",

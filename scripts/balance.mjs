@@ -1,5 +1,7 @@
 import fs from 'node:fs';
-import {ALL_CARDS,CARD_MAP,CHARACTERS,deckOf,newGame,options,rangeAt,resolveRound,validateQueue,dist} from '../src/game.js';
+const engineArg=process.argv.find(x=>x.startsWith('--engine='));
+const engine=await import(engineArg?new URL(engineArg.split('=')[1],import.meta.url):'../src/game.js');
+const {ALL_CARDS,CARD_MAP,CHARACTERS,deckOf,newGame,options,rangeAt,resolveRound,validateQueue,dist}=engine;
 
 const seed=20261016; let rng=seed;
 function random(){rng=(Math.imul(rng,1664525)+1013904223)>>>0;return rng/4294967296;}
@@ -22,7 +24,7 @@ function queueFor(s,side,strategy){
     if(strategy==='range')value+=f.character==='eve'&&c.damage?damage*.12:Math.abs(f.x-e.x)<2&&c.id==='back'?8:0;
     if(strategy==='pressure')value+=dist(f,e)>1&&['forward','jack_dash','zeta_long'].includes(c.id)?8:damage*.1;
     if(strategy==='trap')value+=c.id==='raven_trap'&&dist(a.target,e)<=1?10:c.id==='raven_ult'?8:damage*.05;
-    if(strategy==='response')value+=damage*.08+(dist(f,e)<=2&&c.id==='guard'?4:0);
+    if(strategy==='response')value+=damage*.08+(dist(f,e)<=2&&c.id==='guard'?4:0)+(c.id==='raven_ward'&&dist(f,e)<=3?6:0);
     if(strategy==='random')value=random();
     pool.push({a,value});
    }
@@ -43,7 +45,7 @@ for(const a of ids)for(const b of ids)for(let ay=0;ay<3;ay++)for(let ax=0;ax<4;a
  for(const action of actions[0]){const r=rangeAt(s,0,action),id=action.id,p=s.fighters[1];oneBeat.rangeCells[id]+=r.direct.length+r.glance.length;
   if(r.direct.some(v=>v.x===p.x&&v.y===p.y))oneBeat.direct[id]++;else if(r.glance.some(v=>v.x===p.x&&v.y===p.y))oneBeat.graze[id]++;else oneBeat.miss[id]++;}
 }
-const results={},gamesPerPair=36;
+const results={},gamesPerPair=Number(process.argv.find(x=>x.startsWith('--games='))?.split('=')[1]||324);
 for(const a of ids)for(const b of ids){const key=a+'-vs-'+b;let win=0,draw=0,hp=0;
  for(let i=0;i<gamesPerPair;i++){const s=duel(a,b,strategies[i%strategies.length],strategies[Math.floor(i/strategies.length)%strategies.length]);win+=s.winner===0;draw+=s.winner===-1;hp+=s.fighters[0].hp-s.fighters[1].hp;}
  const rate=(win+draw*.5)/gamesPerPair;results[key]={games:gamesPerPair,wins:win,draws:draw,scoreRate:rate,hpDifference:hp/gamesPerPair,ci95HalfWidth:1.96*Math.sqrt(rate*(1-rate)/gamesPerPair)};

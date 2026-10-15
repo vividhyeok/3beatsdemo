@@ -36,7 +36,7 @@ export const UNIQUE={
   card("raven_jab","부적 타격",10,30,15,"전방 1칸 직격 · 대각선 스침","attack","♢"),
   card("raven_push","역위상",20,40,20,"전방 직격 시 상대 1칸 밀기","attack","⋙"),
   card("raven_trap","좌표 각인",15,45,25,"거리 2 이내 타일에 다음 라운드 함정 설치","trap","⌗",{target:true}),
-  card("raven_ward","경계 부적",20,30,0,"피해 30 감소 · 인접 상대 반격 30","defense","◈"),
+  card("raven_ward","경계 부적",20,30,20,"피해 30 감소 · 인접 상대 반격 30","defense","◈"),
   card("raven_ult","과부하",45,65,30,"설치한 함정을 즉시 폭발","ultimate","✺")
  ],
  zeta:[
@@ -115,7 +115,7 @@ export function rangeAt(state,i,action,origin){
   else if(id==="eve_cross")hit=ad===1?(r===2?2:r===1?1:0):0;
   else if(id==="eve_ult")hit=ad===0?(r===3?2:r===2?1:0):r===3&&ad===1?1:0;
   else if(id==="raven_push")hit=ad===0&&r>=1&&r<=2?2:r===3&&ad===0||r===1&&ad===1?1:0;
-  else if(id==="raven_ward")hit=(Math.abs(x-a.x)+ad)===1?2:0;
+  else if(id==="raven_ward")hit=(Math.abs(x-a.x)+ad)===1?2:ad===0&&r>=2&&r<=3?1:0;
   if(hit===2)direct.push({x,y});else if(hit===1)glance.push({x,y});
  }
  return {direct,glance};
@@ -230,6 +230,7 @@ export function resolveRound(input,queues,{presentation=true}={}){
      const t=s.trap;rawDamage[other]+=explosion(s,i,t.pos,65,30,ev,"과부하",presentation,"raven_ult");s.trap=null;
     }continue;
    }
+   if(id==="raven_ward"&&(!active[other]||CARD_MAP[actions[other].id].damage===0))continue;
    const r=rangeAt(s,i,a);const p=s.fighters[other];
    const grade=inCells(r.direct,p)?"direct":inCells(r.glance,p)?"graze":null;
    if(presentation&&(c.damage>0||id==="raven_ward"))ev.push({type:"attack",side:i,card:id,source:c.name,origin:{...s.fighters[i]},target:{x:p.x,y:p.y},range:structuredClone(r),grade:grade||"miss",raw:grade==="direct"?c.damage:grade==="graze"?c.glance:0});

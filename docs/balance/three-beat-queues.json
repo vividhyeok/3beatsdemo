@@ -1,0 +1,163 @@
+{
+  "jack": {
+    "startEN": 45,
+    "position": [
+      0,
+      1
+    ],
+    "opponent": [
+      3,
+      1
+    ],
+    "valid": 730,
+    "invalid": 601,
+    "classes": {
+      "attack": 0,
+      "move": 64,
+      "defense": 0,
+      "focus": 0,
+      "trap": 0,
+      "mixed": 666
+    },
+    "trapUlt": 0,
+    "minNetEN": -30,
+    "maxNetEN": 45,
+    "cardUses": {
+      "forward": 267,
+      "back": 267,
+      "up": 267,
+      "down": 267,
+      "guard": 213,
+      "focus": 240,
+      "jack_jab": 213,
+      "jack_dash": 146,
+      "jack_slam": 146,
+      "jack_spin": 146,
+      "jack_ult": 18
+    },
+    "directionUses": {}
+  },
+  "eve": {
+    "startEN": 45,
+    "position": [
+      0,
+      1
+    ],
+    "opponent": [
+      3,
+      1
+    ],
+    "valid": 762,
+    "invalid": 569,
+    "classes": {
+      "attack": 0,
+      "move": 64,
+      "defense": 0,
+      "focus": 0,
+      "trap": 0,
+      "mixed": 698
+    },
+    "trapUlt": 0,
+    "minNetEN": -30,
+    "maxNetEN": 45,
+    "cardUses": {
+      "forward": 273,
+      "back": 273,
+      "up": 273,
+      "down": 273,
+      "guard": 219,
+      "focus": 242,
+      "eve_aim": 213,
+      "eve_pierce": 178,
+      "eve_retreat": 178,
+      "eve_cross": 146,
+      "eve_ult": 18
+    },
+    "directionUses": {}
+  },
+  "raven": {
+    "startEN": 45,
+    "position": [
+      0,
+      1
+    ],
+    "opponent": [
+      3,
+      1
+    ],
+    "valid": 2390,
+    "invalid": 3442,
+    "classes": {
+      "attack": 0,
+      "move": 64,
+      "defense": 0,
+      "focus": 0,
+      "trap": 0,
+      "mixed": 2326
+    },
+    "trapUlt": 16,
+    "minNetEN": -30,
+    "maxNetEN": 45,
+    "cardUses": {
+      "forward": 660,
+      "back": 660,
+      "up": 660,
+      "down": 660,
+      "guard": 564,
+      "focus": 580,
+      "raven_jab": 558,
+      "raven_push": 510,
+      "raven_trap": 1792,
+      "raven_ward": 510,
+      "raven_ult": 16
+    },
+    "directionUses": {}
+  },
+  "zeta": {
+    "startEN": 45,
+    "position": [
+      0,
+      1
+    ],
+    "opponent": [
+      3,
+      1
+    ],
+    "valid": 1926,
+    "invalid": 1449,
+    "classes": {
+      "attack": 0,
+      "move": 160,
+      "defense": 0,
+      "focus": 0,
+      "trap": 0,
+      "mixed": 1766
+    },
+    "trapUlt": 0,
+    "minNetEN": -30,
+    "maxNetEN": 45,
+    "cardUses": {
+      "forward": 534,
+      "back": 534,
+      "up": 534,
+      "down": 534,
+      "guard": 450,
+      "focus": 506,
+      "zeta_jab": 398,
+      "zeta_slide": 676,
+      "zeta_long": 676,
+      "zeta_brake": 676,
+      "zeta_ult": 260
+    },
+    "directionUses": {
+      "zeta_slide:up": 338,
+      "zeta_slide:down": 338,
+      "zeta_long:forward": 338,
+      "zeta_long:back": 338,
+      "zeta_brake:up": 338,
+      "zeta_brake:down": 338,
+      "zeta_ult:up": 130,
+      "zeta_ult:down": 130
+    }
+  }
+}

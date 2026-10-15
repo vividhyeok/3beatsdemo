@@ -6,6 +6,8 @@ out=root/'docs'/'balance'
 before=json.loads((out/'baseline.json').read_text(encoding='utf-8'))
 after=json.loads((out/'current.json').read_text(encoding='utf-8'))
 metrics=json.loads((out/'skill-metrics.json').read_text(encoding='utf-8')) if (out/'skill-metrics.json').exists() else {}
+three=json.loads((out/'three-beat-queues.json').read_text(encoding='utf-8')) if (out/'three-beat-queues.json').exists() else {}
+maps=json.loads((out/'map-comparison.json').read_text(encoding='utf-8')) if (out/'map-comparison.json').exists() else []
 changes={
  'jack_dash':'20 / 40 / 20 → 25 / 25 / 15',
  'jack_spin':'25 / 40 / 20 → 30 / 35 / 20',
@@ -33,7 +35,17 @@ for c in before['cards']:
  m=metrics.get(id,{})
  rows.append(f"| {id} | {c['cost']} → {new['cost']} | {m.get('directRate',0):.1%} | {m.get('grazeRate',0):.1%} | {m.get('meanActualDamage',0):.1f} | {m.get('positionChangeRate',0):.1%} | {m.get('blockRate',0):.1%} | {m.get('meanDamageReduction',0):.1f} | {changes.get(id,'유지')} |")
 (out/'skill-analysis.md').write_text('\n'.join(rows)+'\n',encoding='utf-8')
-report=['# 최종 밸런스 리포트','',intro,single,'## 기준값과 패치 후 결과','',table(before),'',table(after),'','## 변경 내역','']
+report=['# 최종 밸런스 리포트','',intro,single,'## 시작 상태의 3비트 예약 조합','',
+'초기 EN 45, 양측 기본 시작 좌표에서 각 캐릭터의 방향 및 목표 선택을 포함한 3비트 예약을 완전열거했다. 상대의 예약과 전투 결과를 완전열거한 수는 아니다. 세 번 연속 공격 예약은 이 EN 조건에서 유효하지 않았다.','',
+'| 캐릭터 | 유효 예약 | 무효 예약 | 이동 3회 | 함정→궁극기 |','|---|---:|---:|---:|---:|']
+for id in names:
+ t=three.get(id,{});report.append(f"| {id.upper()} | {t.get('valid',0)} | {t.get('invalid',0)} | {t.get('classes',{}).get('move',0)} | {t.get('trapUlt',0)} |")
+report+=['','## 기준값과 패치 후 결과','',table(before),'',table(after),'','## 변경 내역','']
+report+=['','## 전장 대안의 기하학적 비교','',
+'아래 값은 전투 시뮬레이션 승률이 아니라 좌표로 계산한 전장 구조다. 5×3과 5×4는 공격 범위, 점령 규칙, 시작 위치의 재설계가 필요해 이번 패치에서 채택하지 않았다. 4×3을 유지하고 ZETA 대각 진입을 먼저 시험했다.','',
+'| 전장 | 위치 쌍 | 2칸 이내 % | 회전 베기 인접 % | 시작 거리 | 시작 이동 선택지 |','|---|---:|---:|---:|---:|---:|']
+for m in maps:report.append(f"| {m['size']}{' + 대각 이동' if m['diagonal'] else ''} | {m['orderedPositions']} | {m['withinTwoManhattan']:.1%} | {m['spinAdjacentCoverage']:.1%} | {m['startDistance']} | {m['startMoveDestinations']} |")
+report+=['','## ?? ??','']
 for id,change in changes.items():report.append(f'- `{id}`: {change}')
 report+=['','그 외 카드는 수치를 유지했다. 4×3 전장의 빠른 교전을 유지하면서 ZETA의 대각 진입과 RAVEN의 설치 사거리를 먼저 시험했다. 일반 이동은 여전히 고유 이동 공격에 비해 기회비용이 크며 후속 패치에서 검증해야 한다.','', '## 관찰','',
 f"- JACK → ZETA: {before['matchups']['jack-vs-zeta']['scoreRate']:.1%} → {after['matchups']['jack-vs-zeta']['scoreRate']:.1%}.",

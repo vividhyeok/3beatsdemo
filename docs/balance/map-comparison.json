@@ -1,0 +1,42 @@
+[
+  {
+    "size": "4x3",
+    "cells": 12,
+    "orderedPositions": 132,
+    "withinTwoManhattan": 0.5909090909090909,
+    "spinAdjacentCoverage": 0.4393939393939394,
+    "startDistance": 3,
+    "startMoveDestinations": 3,
+    "diagonal": false
+  },
+  {
+    "size": "5x3",
+    "cells": 15,
+    "orderedPositions": 210,
+    "withinTwoManhattan": 0.49523809523809526,
+    "spinAdjacentCoverage": 0.3619047619047619,
+    "startDistance": 4,
+    "startMoveDestinations": 3,
+    "diagonal": false
+  },
+  {
+    "size": "5x4",
+    "cells": 20,
+    "orderedPositions": 380,
+    "withinTwoManhattan": 0.4052631578947368,
+    "spinAdjacentCoverage": 0.2894736842105263,
+    "startDistance": 4,
+    "startMoveDestinations": 3,
+    "diagonal": false
+  },
+  {
+    "size": "4x3",
+    "cells": 12,
+    "orderedPositions": 132,
+    "withinTwoManhattan": 0.5909090909090909,
+    "spinAdjacentCoverage": 0.4393939393939394,
+    "startDistance": 3,
+    "startMoveDestinations": 5,
+    "diagonal": true
+  }
+]

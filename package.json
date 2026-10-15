@@ -9,7 +9,8 @@
     "build": "node build.mjs",
     "test:browser": "node tests/browser-smoke.mjs",
     "balance": "node scripts/balance.mjs",
-    "balance:exhaustive": "node scripts/exhaustive-beats.mjs"
+    "balance:exhaustive": "node scripts/exhaustive-beats.mjs",
+    "balance:queues": "node scripts/three-beat-queues.mjs"
   },
   "description": "No-dependency simultaneous tactical card duel demo"
 }

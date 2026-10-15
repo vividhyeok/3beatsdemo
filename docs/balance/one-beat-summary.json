@@ -1,0 +1,13 @@
+{
+  "positionsPerPair": 132,
+  "characterPairs": 16,
+  "executed": 406212,
+  "skipped": 132,
+  "rawDamage": [
+    1722345,
+    1649545
+  ],
+  "blockedMovements": 26512,
+  "missEvents": 175972,
+  "limit": null
+}

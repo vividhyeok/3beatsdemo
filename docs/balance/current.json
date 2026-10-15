@@ -1,0 +1,497 @@
+{
+  "seed": 20261016,
+  "strategies": [
+    "attack",
+    "guard",
+    "mobility",
+    "efficient",
+    "range",
+    "pressure",
+    "trap",
+    "response",
+    "random"
+  ],
+  "gamesPerPair": 36,
+  "oneBeat": {
+    "positions": 132,
+    "cardPairs": 406344,
+    "direct": {
+      "forward": 0,
+      "back": 0,
+      "up": 0,
+      "down": 0,
+      "guard": 0,
+      "focus": 0,
+      "jack_jab": 72,
+      "jack_dash": 72,
+      "jack_slam": 48,
+      "jack_spin": 72,
+      "jack_ult": 120,
+      "eve_aim": 48,
+      "eve_pierce": 72,
+      "eve_retreat": 120,
+      "eve_cross": 64,
+      "eve_ult": 24,
+      "raven_jab": 72,
+      "raven_push": 120,
+      "raven_trap": 0,
+      "raven_ward": 136,
+      "raven_ult": 0,
+      "zeta_jab": 72,
+      "zeta_slide": 144,
+      "zeta_long": 0,
+      "zeta_brake": 0,
+      "zeta_ult": 144
+    },
+    "graze": {
+      "forward": 0,
+      "back": 0,
+      "up": 0,
+      "down": 0,
+      "guard": 0,
+      "focus": 0,
+      "jack_jab": 96,
+      "jack_dash": 96,
+      "jack_slam": 72,
+      "jack_spin": 160,
+      "jack_ult": 160,
+      "eve_aim": 96,
+      "eve_pierce": 136,
+      "eve_retreat": 96,
+      "eve_cross": 96,
+      "eve_ult": 80,
+      "raven_jab": 96,
+      "raven_push": 120,
+      "raven_trap": 1168,
+      "raven_ward": 0,
+      "raven_ult": 0,
+      "zeta_jab": 96,
+      "zeta_slide": 192,
+      "zeta_long": 0,
+      "zeta_brake": 0,
+      "zeta_ult": 192
+    },
+    "miss": {
+      "forward": 2112,
+      "back": 2112,
+      "up": 2112,
+      "down": 2112,
+      "guard": 2112,
+      "focus": 2112,
+      "jack_jab": 360,
+      "jack_dash": 360,
+      "jack_slam": 408,
+      "jack_spin": 296,
+      "jack_ult": 248,
+      "eve_aim": 384,
+      "eve_pierce": 320,
+      "eve_retreat": 312,
+      "eve_cross": 368,
+      "eve_ult": 424,
+      "raven_jab": 360,
+      "raven_push": 288,
+      "raven_trap": 3312,
+      "raven_ward": 392,
+      "raven_ult": 528,
+      "zeta_jab": 360,
+      "zeta_slide": 720,
+      "zeta_long": 1056,
+      "zeta_brake": 1056,
+      "zeta_ult": 720
+    },
+    "rangeCells": {
+      "forward": 0,
+      "back": 0,
+      "up": 0,
+      "down": 0,
+      "guard": 0,
+      "focus": 0,
+      "jack_jab": 1176,
+      "jack_dash": 1176,
+      "jack_slam": 912,
+      "jack_spin": 2552,
+      "jack_ult": 2128,
+      "eve_aim": 1152,
+      "eve_pierce": 1696,
+      "eve_retreat": 1584,
+      "eve_cross": 1216,
+      "eve_ult": 968,
+      "raven_jab": 1176,
+      "raven_push": 1824,
+      "raven_trap": 17520,
+      "raven_ward": 1496,
+      "raven_ult": 0,
+      "zeta_jab": 1176,
+      "zeta_slide": 2352,
+      "zeta_long": 0,
+      "zeta_brake": 0,
+      "zeta_ult": 2352
+    }
+  },
+  "matchups": {
+    "jack-vs-jack": {
+      "games": 36,
+      "wins": 17,
+      "draws": 2,
+      "scoreRate": 0.5,
+      "hpDifference": -3.75,
+      "ci95HalfWidth": 0.16333333333333333
+    },
+    "jack-vs-eve": {
+      "games": 36,
+      "wins": 9,
+      "draws": 1,
+      "scoreRate": 0.2638888888888889,
+      "hpDifference": -33.47222222222222,
+      "ci95HalfWidth": 0.14397499092194427
+    },
+    "jack-vs-raven": {
+      "games": 36,
+      "wins": 16,
+      "draws": 1,
+      "scoreRate": 0.4583333333333333,
+      "hpDifference": -12.777777777777779,
+      "ci95HalfWidth": 0.16276521566999125
+    },
+    "jack-vs-zeta": {
+      "games": 36,
+      "wins": 18,
+      "draws": 0,
+      "scoreRate": 0.5,
+      "hpDifference": -13.472222222222221,
+      "ci95HalfWidth": 0.16333333333333333
+    },
+    "eve-vs-jack": {
+      "games": 36,
+      "wins": 21,
+      "draws": 0,
+      "scoreRate": 0.5833333333333334,
+      "hpDifference": 22.916666666666668,
+      "ci95HalfWidth": 0.161048838539934
+    },
+    "eve-vs-eve": {
+      "games": 36,
+      "wins": 15,
+      "draws": 4,
+      "scoreRate": 0.4722222222222222,
+      "hpDifference": 3.888888888888889,
+      "ci95HalfWidth": 0.16308108093054816
+    },
+    "eve-vs-raven": {
+      "games": 36,
+      "wins": 24,
+      "draws": 0,
+      "scoreRate": 0.6666666666666666,
+      "hpDifference": 31.38888888888889,
+      "ci95HalfWidth": 0.1539921434584037
+    },
+    "eve-vs-zeta": {
+      "games": 36,
+      "wins": 18,
+      "draws": 1,
+      "scoreRate": 0.5138888888888888,
+      "hpDifference": 16.52777777777778,
+      "ci95HalfWidth": 0.16327030676979307
+    },
+    "raven-vs-jack": {
+      "games": 36,
+      "wins": 20,
+      "draws": 1,
+      "scoreRate": 0.5694444444444444,
+      "hpDifference": 3.0555555555555554,
+      "ci95HalfWidth": 0.1617503018571886
+    },
+    "raven-vs-eve": {
+      "games": 36,
+      "wins": 11,
+      "draws": 1,
+      "scoreRate": 0.3194444444444444,
+      "hpDifference": -36.80555555555556,
+      "ci95HalfWidth": 0.1523120567126169
+    },
+    "raven-vs-raven": {
+      "games": 36,
+      "wins": 21,
+      "draws": 1,
+      "scoreRate": 0.5972222222222222,
+      "hpDifference": 0.1388888888888889,
+      "ci95HalfWidth": 0.16021587695693876
+    },
+    "raven-vs-zeta": {
+      "games": 36,
+      "wins": 13,
+      "draws": 1,
+      "scoreRate": 0.375,
+      "hpDifference": -11.11111111111111,
+      "ci95HalfWidth": 0.1581468199701362
+    },
+    "zeta-vs-jack": {
+      "games": 36,
+      "wins": 18,
+      "draws": 0,
+      "scoreRate": 0.5,
+      "hpDifference": 7.222222222222222,
+      "ci95HalfWidth": 0.16333333333333333
+    },
+    "zeta-vs-eve": {
+      "games": 36,
+      "wins": 15,
+      "draws": 3,
+      "scoreRate": 0.4583333333333333,
+      "hpDifference": -13.75,
+      "ci95HalfWidth": 0.16276521566999125
+    },
+    "zeta-vs-raven": {
+      "games": 36,
+      "wins": 15,
+      "draws": 2,
+      "scoreRate": 0.4444444444444444,
+      "hpDifference": -10.277777777777779,
+      "ci95HalfWidth": 0.16232197169998472
+    },
+    "zeta-vs-zeta": {
+      "games": 36,
+      "wins": 12,
+      "draws": 2,
+      "scoreRate": 0.3611111111111111,
+      "hpDifference": -7.083333333333333,
+      "ci95HalfWidth": 0.15690540867106267
+    }
+  },
+  "cards": [
+    {
+      "id": "forward",
+      "cost": 0,
+      "damage": 0,
+      "glance": 0,
+      "direct": 0,
+      "graze": 0,
+      "miss": 2112
+    },
+    {
+      "id": "back",
+      "cost": 0,
+      "damage": 0,
+      "glance": 0,
+      "direct": 0,
+      "graze": 0,
+      "miss": 2112
+    },
+    {
+      "id": "up",
+      "cost": 0,
+      "damage": 0,
+      "glance": 0,
+      "direct": 0,
+      "graze": 0,
+      "miss": 2112
+    },
+    {
+      "id": "down",
+      "cost": 0,
+      "damage": 0,
+      "glance": 0,
+      "direct": 0,
+      "graze": 0,
+      "miss": 2112
+    },
+    {
+      "id": "guard",
+      "cost": 0,
+      "damage": 0,
+      "glance": 0,
+      "direct": 0,
+      "graze": 0,
+      "miss": 2112
+    },
+    {
+      "id": "focus",
+      "cost": 0,
+      "damage": 0,
+      "glance": 0,
+      "direct": 0,
+      "graze": 0,
+      "miss": 2112
+    },
+    {
+      "id": "jack_jab",
+      "cost": 10,
+      "damage": 30,
+      "glance": 15,
+      "direct": 72,
+      "graze": 96,
+      "miss": 360
+    },
+    {
+      "id": "jack_dash",
+      "cost": 25,
+      "damage": 25,
+      "glance": 15,
+      "direct": 72,
+      "graze": 96,
+      "miss": 360
+    },
+    {
+      "id": "jack_slam",
+      "cost": 35,
+      "damage": 60,
+      "glance": 30,
+      "direct": 48,
+      "graze": 72,
+      "miss": 408
+    },
+    {
+      "id": "jack_spin",
+      "cost": 30,
+      "damage": 35,
+      "glance": 20,
+      "direct": 72,
+      "graze": 160,
+      "miss": 296
+    },
+    {
+      "id": "jack_ult",
+      "cost": 60,
+      "damage": 70,
+      "glance": 35,
+      "direct": 120,
+      "graze": 160,
+      "miss": 248
+    },
+    {
+      "id": "eve_aim",
+      "cost": 10,
+      "damage": 30,
+      "glance": 15,
+      "direct": 48,
+      "graze": 96,
+      "miss": 384
+    },
+    {
+      "id": "eve_pierce",
+      "cost": 20,
+      "damage": 40,
+      "glance": 20,
+      "direct": 72,
+      "graze": 136,
+      "miss": 320
+    },
+    {
+      "id": "eve_retreat",
+      "cost": 25,
+      "damage": 30,
+      "glance": 15,
+      "direct": 120,
+      "graze": 96,
+      "miss": 312
+    },
+    {
+      "id": "eve_cross",
+      "cost": 30,
+      "damage": 40,
+      "glance": 20,
+      "direct": 64,
+      "graze": 96,
+      "miss": 368
+    },
+    {
+      "id": "eve_ult",
+      "cost": 60,
+      "damage": 70,
+      "glance": 35,
+      "direct": 24,
+      "graze": 80,
+      "miss": 424
+    },
+    {
+      "id": "raven_jab",
+      "cost": 10,
+      "damage": 30,
+      "glance": 15,
+      "direct": 72,
+      "graze": 96,
+      "miss": 360
+    },
+    {
+      "id": "raven_push",
+      "cost": 20,
+      "damage": 40,
+      "glance": 20,
+      "direct": 120,
+      "graze": 120,
+      "miss": 288
+    },
+    {
+      "id": "raven_trap",
+      "cost": 15,
+      "damage": 45,
+      "glance": 25,
+      "direct": 0,
+      "graze": 1168,
+      "miss": 3312
+    },
+    {
+      "id": "raven_ward",
+      "cost": 20,
+      "damage": 30,
+      "glance": 0,
+      "direct": 136,
+      "graze": 0,
+      "miss": 392
+    },
+    {
+      "id": "raven_ult",
+      "cost": 45,
+      "damage": 65,
+      "glance": 30,
+      "direct": 0,
+      "graze": 0,
+      "miss": 528
+    },
+    {
+      "id": "zeta_jab",
+      "cost": 10,
+      "damage": 30,
+      "glance": 15,
+      "direct": 72,
+      "graze": 96,
+      "miss": 360
+    },
+    {
+      "id": "zeta_slide",
+      "cost": 15,
+      "damage": 40,
+      "glance": 20,
+      "direct": 144,
+      "graze": 192,
+      "miss": 720
+    },
+    {
+      "id": "zeta_long",
+      "cost": 10,
+      "damage": 0,
+      "glance": 0,
+      "direct": 0,
+      "graze": 0,
+      "miss": 1056
+    },
+    {
+      "id": "zeta_brake",
+      "cost": 10,
+      "damage": 0,
+      "glance": 0,
+      "direct": 0,
+      "graze": 0,
+      "miss": 1056
+    },
+    {
+      "id": "zeta_ult",
+      "cost": 45,
+      "damage": 60,
+      "glance": 30,
+      "direct": 144,
+      "graze": 192,
+      "miss": 720
+    }
+  ]
+}

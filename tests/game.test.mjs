@@ -56,7 +56,7 @@ test("Raven delayed mine explodes on next round beat 2 after movement",()=>{
  const first=resolveRound(s,[[{id:"raven_trap",target:{x:1,y:1}},{id:"focus"},{id:"guard"}],q("focus","guard","back")]).state;
  assert.ok(first.trap);assert.equal(first.trap.armedRound,2);
  const second=resolveRound(first,[q("guard","focus","up"),q("forward","forward","focus")]);
- assert.equal(second.state.fighters[1].hp,MAX_HP-40);
+ assert.equal(second.state.fighters[1].hp,MAX_HP-45);
  assert.equal(second.state.trap,null);
 });
 test("AI generates legal queues using public state only",()=>{

@@ -41,3 +41,9 @@
  .card-stats{font-size:9px}
  .card-stats b{font-size:10px}
 }
+.tile.preview-path{box-shadow:inset 0 0 0 3px rgba(255,207,91,.65);}
+.tile.preview-arrival{box-shadow:inset 0 0 0 4px #ffcf5b,0 0 24px rgba(255,207,91,.55);}
+.queue-slot{touch-action:pan-y;}
+.hp-meter span,.hostile .hp-meter span{background:linear-gradient(90deg,#238f55,#7debb0)}
+.en-meter{height:8px}
+.en-meter span{background:linear-gradient(90deg,#2369ca,#77bdff)}

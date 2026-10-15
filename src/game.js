@@ -20,9 +20,9 @@ export const COMMON=[
 export const UNIQUE={
  jack:[
   card("jack_jab","견제 베기",10,30,15,"전방 1칸 직격 · 상하 대각선 스침","attack","╱"),
-  card("jack_dash","압박 돌진",20,40,20,"전진 1칸 후 전방 1칸 직격","attack","➤"),
+  card("jack_dash","압박 돌진",25,25,15,"전진 1칸 후 전방 1칸 직격","attack","➤"),
   card("jack_slam","대검 내려찍기",35,60,30,"전방 2칸 직격 · 1칸 스침","attack","⚔"),
-  card("jack_spin","회전 베기",25,40,20,"인접 8칸 타격 · 정면 직격","attack","◎"),
+  card("jack_spin","회전 베기",30,35,20,"인접 8칸 타격 · 정면 직격","attack","◎"),
   card("jack_ult","파쇄선",60,70,35,"전방 1~2칸 직격 · 주변 스침","ultimate","✷")
  ],
  eve:[
@@ -34,17 +34,17 @@ export const UNIQUE={
  ],
  raven:[
   card("raven_jab","부적 타격",10,30,15,"전방 1칸 직격 · 대각선 스침","attack","♢"),
-  card("raven_push","역위상",25,40,20,"전방 직격 시 상대 1칸 밀기","attack","⋙"),
-  card("raven_trap","좌표 각인",20,40,20,"거리 2 이내 타일에 다음 라운드 함정 설치","trap","⌗",{target:true}),
+  card("raven_push","역위상",20,40,20,"전방 직격 시 상대 1칸 밀기","attack","⋙"),
+  card("raven_trap","좌표 각인",15,45,25,"거리 2 이내 타일에 다음 라운드 함정 설치","trap","⌗",{target:true}),
   card("raven_ward","경계 부적",20,30,0,"피해 30 감소 · 인접 상대 반격 30","defense","◈"),
-  card("raven_ult","과부하",55,60,30,"설치한 함정을 즉시 폭발","ultimate","✺")
+  card("raven_ult","과부하",45,65,30,"설치한 함정을 즉시 폭발","ultimate","✺")
  ],
  zeta:[
   card("zeta_jab","톤파 견제",10,30,15,"전방 1칸 직격 · 상하 스침","attack","╱"),
-  card("zeta_slide","사이드 슬라이드",20,40,20,"위·아래 1칸 이동 후 전방 타격","attack","⤴",{directions:["up","down"]}),
-  card("zeta_long","롱 슬라이드",15,0,0,"전진 또는 후퇴 최대 2칸","move","⇄",{directions:["forward","back"]}),
-  card("zeta_brake","브레이크",20,0,0,"위·아래 1칸 이동 · 피해 15 감소","defense","⤓",{directions:["up","down"]}),
-  card("zeta_ult","엇박 난무",55,60,30,"전방 대각선 이동 후 강력한 공격","ultimate","✶",{directions:["up","down"]})
+  card("zeta_slide","사이드 슬라이드",15,40,20,"위·아래 1칸 이동 후 전방 타격","attack","⤴",{directions:["up","down"]}),
+  card("zeta_long","롱 슬라이드",10,0,0,"전진 또는 후퇴 최대 2칸","move","⇄",{directions:["forward","back"]}),
+  card("zeta_brake","브레이크",10,0,0,"위·아래 1칸 이동 · 피해 15 감소","defense","⤓",{directions:["up","down"]}),
+  card("zeta_ult","엇박 난무",45,60,30,"전방 대각선 이동 후 강력한 공격","ultimate","✶",{directions:["up","down"]})
  ]
 };
 export const ALL_CARDS=[...COMMON,...Object.values(UNIQUE).flat()];
@@ -65,7 +65,7 @@ export function options(state,i,id){
  const c=CARD_MAP[id];if(!c)return [];
  if(c.target){
   const me=state.fighters[i],enemy=state.fighters[1-i],res=[];
-  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(dist(me,{x,y})<=2&&!(x===me.x&&y===me.y)&&!(x===enemy.x&&y===enemy.y))
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(dist(me,{x,y})<=3&&!(x===me.x&&y===me.y)&&!(x===enemy.x&&y===enemy.y))
    res.push({id,target:{x,y}});
   return res;
  }
@@ -79,7 +79,7 @@ export function validateQueue(state,i,queue){
   if(!c.repeat&&seen.has(c.id))return "같은 고유 기술·방어·집중은 한 라운드에 한 번만 사용할 수 있습니다.";
   seen.add(c.id);
   if(c.directions&&!c.directions.includes(a.direction))return "기술 방향을 선택하세요.";
-  if(c.target&&(!a.target||!inside(a.target.x,a.target.y)||dist(state.fighters[i],a.target)>2))return "함정 설치 위치를 선택하세요.";
+  if(c.target&&(!a.target||!inside(a.target.x,a.target.y)||dist(state.fighters[i],a.target)>3))return "함정 설치 위치를 선택하세요.";
   if(c.id==="raven_ult"&&!hasTrap&& !seen.has("raven_trap"))return "과부하는 먼저 설치된 함정이 있어야 합니다.";
   if(c.id==="raven_trap")hasTrap=true;
   if(c.id==="raven_ult")hasTrap=false;
@@ -110,11 +110,11 @@ export function rangeAt(state,i,action,origin){
   else if(id==="jack_spin")hit=cheb===1?(r===1&&ad===0?2:1):0;
   else if(id==="jack_ult")hit=r>=1&&r<=2?(ad===0?2:ad===1?1:0):0;
   else if(id==="eve_aim")hit=ad===0?(r===2?2:r===1||r===3?1:0):0;
-  else if(id==="eve_pierce")hit=ad===0&&r>=1&&r<=3?2:r===2&&ad===1?1:0;
+  else if(id==="eve_pierce")hit=ad===0&&r>=2&&r<=3?2:r===1&&ad===0||r===2&&ad===1?1:0;
   else if(id==="eve_retreat")hit=ad===0&&r>=1&&r<=2?2:r===1&&ad===1?1:0;
   else if(id==="eve_cross")hit=ad===1?(r===2?2:r===1?1:0):0;
   else if(id==="eve_ult")hit=ad===0?(r===3?2:r===2?1:0):r===3&&ad===1?1:0;
-  else if(id==="raven_push")hit=ad===0&&r>=1&&r<=2?2:r===1&&ad===1?1:0;
+  else if(id==="raven_push")hit=ad===0&&r>=1&&r<=2?2:r===3&&ad===0||r===1&&ad===1?1:0;
   else if(id==="raven_ward")hit=(Math.abs(x-a.x)+ad)===1?2:0;
   if(hit===2)direct.push({x,y});else if(hit===1)glance.push({x,y});
  }
@@ -127,10 +127,25 @@ function targetFor(me,face,action){
  else if(id==="back"||id==="eve_retreat")dx=-face;
  else if(id==="up")dy=-1;
  else if(id==="down")dy=1;
- else if(["zeta_slide","zeta_brake"].includes(id))dy=action.direction==="up"?-1:1;
+ else if(["zeta_slide","zeta_brake"].includes(id)){dy=action.direction==="up"?-1:1;if(id==="zeta_slide")dx=face;}
  else if(id==="zeta_long"){dx=action.direction==="forward"?face:-face;steps=2;}
  else if(id==="zeta_ult"){dx=face;dy=action.direction==="up"?-1:1;}
  return {dx,dy,steps};
+}
+export function projectPath(state,side,actions){
+ const me={...state.fighters[side]},enemy=state.fighters[1-side],path=[],risks=[];
+ for(const action of actions){
+  if(!action)continue;
+  const face=enemy.x===me.x?me.facing:(enemy.x>me.x?1:-1),move=targetFor(me,face,action);
+  for(let step=0;step<move.steps;step++){
+   if(!move.dx&&!move.dy)break;
+   const next={x:me.x+move.dx,y:me.y+move.dy};
+   if(!inside(next.x,next.y)){risks.push('edge');break;}
+   if(next.x===enemy.x&&next.y===enemy.y){risks.push('occupied');break;}
+   me.x=next.x;me.y=next.y;path.push({...next});
+  }
+ }
+ return {origin:me,path,risks,uncertain:true};
 }
 function performMovement(s,actions,ev,trace){
  const moves=s.fighters.map((me,i)=>targetFor(me,me.facing,actions[i]));
@@ -186,7 +201,7 @@ export function resolveRound(input,queues,{presentation=true}={}){
    f.en-=c.cost;
    if(c.id==="focus")f.en=Math.min(MAX_EN,f.en+30);
    if(c.id==="guard"||c.id==="raven_ward")guards[i]+=30;
-   if(c.id==="zeta_brake")guards[i]+=15;
+   if(c.id==="zeta_brake")guards[i]+=30;
    ev.push({type:"action",side:i,text:c.name});
   }
   const moving=actions.map((a,i)=>active[i]?a:{id:"idle"});
@@ -195,14 +210,14 @@ export function resolveRound(input,queues,{presentation=true}={}){
   const rawDamage=[0,0],pushes=[];
   // Environment and traps trigger after movement, before current attacks.
   if(s.trap&&s.trap.armedRound===s.round&&beat===2&&!(active[s.trap.owner]&&actions[s.trap.owner].id==="raven_ult")){
-   const t=s.trap;rawDamage[1-t.owner]+=explosion(s,t.owner,t.pos,40,20,ev,"좌표 각인",presentation,"raven_trap");
+   const t=s.trap;rawDamage[1-t.owner]+=explosion(s,t.owner,t.pos,45,25,ev,"좌표 각인",presentation,"raven_trap");
    s.trap=null;
   }
   for(let i=0;i<2;i++){
    if(!active[i])continue;
    const a=actions[i],id=a.id,c=CARD_MAP[id],other=1-i;
    if(id==="raven_trap"){
-    if(a.target&&inside(a.target.x,a.target.y)&&dist(s.fighters[i],a.target)<=2&&
+    if(a.target&&inside(a.target.x,a.target.y)&&dist(s.fighters[i],a.target)<=3&&
        !(s.fighters[0].x===a.target.x&&s.fighters[0].y===a.target.y)&&
        !(s.fighters[1].x===a.target.x&&s.fighters[1].y===a.target.y)){
       s.trap={owner:i,pos:{...a.target},armedRound:s.round+1};
@@ -212,7 +227,7 @@ export function resolveRound(input,queues,{presentation=true}={}){
    }
    if(id==="raven_ult"){
     if(s.trap&&s.trap.owner===i){
-     const t=s.trap;rawDamage[other]+=explosion(s,i,t.pos,60,30,ev,"과부하",presentation,"raven_ult");s.trap=null;
+     const t=s.trap;rawDamage[other]+=explosion(s,i,t.pos,65,30,ev,"과부하",presentation,"raven_ult");s.trap=null;
     }continue;
    }
    const r=rangeAt(s,i,a);const p=s.fighters[other];
@@ -227,6 +242,10 @@ export function resolveRound(input,queues,{presentation=true}={}){
   for(let i=0;i<2;i++){
    const hpBefore=s.fighters[i].hp,dealt=Math.max(0,rawDamage[i]-guards[i]);s.fighters[i].hp=Math.max(0,s.fighters[i].hp-dealt);
    s.fighters[i].damageTaken+=dealt;
+   if(active[i]&&actions[i].id==="zeta_brake"&&rawDamage[i]===0&&CARD_MAP[actions[1-i].id].damage>0){
+    s.fighters[i].en=Math.min(MAX_EN,s.fighters[i].en+15);
+    ev.push({type:"energy",side:i,amount:15,text:"회피 성공 / EN +15"});
+   }
    if(presentation)ev.push({type:"damage",side:i,pos:{x:s.fighters[i].x,y:s.fighters[i].y},raw:rawDamage[i],blocked:Math.min(rawDamage[i],guards[i]),dealt,hpBefore,hpAfter:s.fighters[i].hp,actual:hpBefore-s.fighters[i].hp});
    if(rawDamage[i]&&guards[i])ev.push({type:"guard",side:i,amount:Math.min(rawDamage[i],guards[i]),text:"방어 감소"});
   }

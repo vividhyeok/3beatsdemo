@@ -1,0 +1,8 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#070b14"><title>THREE BEATS / ONLINE</title><link rel="stylesheet" href="online.css"></head><body>
+<header><a href="/">THREE <b>BEATS</b></a><strong>ONLINE / 1 VS 1</strong><button id="leave" hidden>방 나가기</button></header>
+<main><div id="message" role="status">서버 연결 확인 중...</div>
+<section id="entry" hidden><h1>친구와 3비트 대전</h1><p>두 기기에서 같은 방에 입장합니다. 양쪽 카드가 제출되면 함께 공개됩니다.</p><button id="create">방 만들기</button><div class="join"><input id="code" maxlength="10" autocomplete="off" placeholder="초대 코드" aria-label="초대 코드"><button id="join">코드로 입장</button></div></section>
+<section id="lobby" hidden><h1>대전 준비</h1><p>초대 코드 <strong id="room-code"></strong></p><button id="copy">초대 URL 복사</button><div id="players" class="players"></div><h2>내 파이터</h2><div id="characters" class="characters"></div><button id="ready">준비 완료</button></section>
+<section id="game" hidden><div class="match-info"><div id="mine"></div><div id="round"></div><div id="theirs"></div></div><div id="enemy-queue" class="enemy-queue"></div><div id="board" class="board"></div><div id="feedback" class="feedback"></div><div id="my-queue" class="my-queue"></div><div id="direction" class="direction" hidden></div><div id="cards" class="cards"></div><button id="submit" disabled>3비트 제출</button></section>
+<section id="result" hidden><h1 id="result-title"></h1><p id="result-score"></p><button id="rematch">재대전</button></section>
+</main><script type="module" src="/src/online-client.js"></script></body></html>

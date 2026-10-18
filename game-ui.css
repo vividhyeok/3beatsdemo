@@ -47,3 +47,53 @@
 .hp-meter span,.hostile .hp-meter span{background:linear-gradient(90deg,#238f55,#7debb0)}
 .en-meter{height:8px}
 .en-meter span{background:linear-gradient(90deg,#2369ca,#77bdff)}
+
+/* Touch targets and narrow layouts keep every command reachable. */
+html,body{max-width:100%;overflow-x:hidden}
+.screen{min-height:100dvh}
+.menu-screen{padding-bottom:env(safe-area-inset-bottom)}
+.menu-footer{bottom:max(20px,env(safe-area-inset-bottom))}
+.load-error{grid-column:1/-1;padding:12px;border:1px solid #ffb596;background:#5b2534cc}
+.load-error p{margin:0 0 5px;color:#fff}
+.load-error small{display:block;overflow-wrap:anywhere;margin-bottom:8px}
+.load-error button{min-height:44px}
+.versus-overlay{pointer-events:none}
+.ad-slot{width:100%;max-width:728px;min-height:90px;margin:18px auto 0;overflow:hidden}
+.ad-slot[hidden]{display:none}
+.queue-reorder{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:5px}
+.reorder-pair{display:flex;gap:5px}
+.reorder-pair button{flex:1;min-width:0;min-height:35px;border:1px solid #7196b7;background:#102b40;color:white}
+.direction-choices button,.battle-tools button,.result-actions button{min-height:44px}
+.queue-slot{min-height:68px}
+.skill-card.active{outline:3px solid #ffe29c;outline-offset:1px;box-shadow:0 0 18px #ffd78a99}
+@media(max-width:700px){
+ .menu-screen{align-items:flex-start;min-height:100dvh}
+ .menu-actions{margin:max(100px,16dvh) auto 90px;width:min(340px,90vw)}
+ .menu-button{min-height:58px}
+ .select-screen{padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+ .hero-choice{min-height:44px}
+ .hero-choice img{height:clamp(118px,25dvh,190px)}
+ .match-settings select,.match-settings button{min-height:44px}
+ .battle-top{padding-top:max(10px,env(safe-area-inset-top))}
+ .battle-tools{width:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+ .battle-tools button{min-width:0;padding:5px 2px;font-size:9px;white-space:normal}
+ .battle-stage{height:clamp(390px,57dvh,490px)}
+ .board-container{top:56%;height:clamp(150px,25dvh,205px)}
+ .unit{width:clamp(48px,17vw,73px);height:clamp(75px,25vw,110px)}
+ .command-dock{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+ .cards,.deck-group:last-child .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .card-title{font-size:10px;white-space:normal;line-height:1.2}
+ .card-stats{font-size:9px}
+ .card-bottom{min-height:58px}
+ .reorder-pair button{min-height:44px}
+ .submit-area button{min-height:44px}
+ .result-screen{min-height:100dvh;align-items:flex-end}
+ .result-copy{margin:0 4vw calc(12px + env(safe-area-inset-bottom));width:92vw;max-height:58dvh;overflow-y:auto;padding:16px}
+ .result-winner{height:55%;width:75%}
+ .result-loser{height:45%}
+}
+@media(max-width:700px) and (max-height:650px){
+ .menu-actions{margin-top:72px;margin-bottom:62px}
+ .battle-stage{height:390px}
+ .result-copy{max-height:70dvh}
+}

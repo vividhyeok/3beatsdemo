@@ -6,8 +6,10 @@
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "start": "python3 -m http.server 8080",
+    "start:online": "node server/online-server.mjs",
     "build": "node build.mjs",
     "test:browser": "node tests/browser-smoke.mjs",
+    "test:online-browser": "node tests/online-browser.mjs",
     "balance": "node scripts/balance.mjs",
     "balance:exhaustive": "node scripts/exhaustive-beats.mjs",
     "balance:queues": "node scripts/three-beat-queues.mjs"

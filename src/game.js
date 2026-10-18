@@ -76,10 +76,12 @@ export function validateQueue(state,i,queue){
  let energy=state.fighters[i].en,seen=new Set(),hasTrap=state.trap&&state.trap.owner===i;
  for(const a of queue){
   const c=CARD_MAP[a&&a.id];if(!c||!deckOf(state.fighters[i].character).some(v=>v.id===c.id))return "사용할 수 없는 카드가 있습니다.";
+  if(!a||typeof a!=='object'||Object.keys(a).some(key=>!['id','direction','target'].includes(key)))return "명령 형식이 올바르지 않습니다.";
+  if((!c.directions&&a.direction!==undefined)||(!c.target&&a.target!==undefined))return "명령 형식이 올바르지 않습니다.";
   if(!c.repeat&&seen.has(c.id))return "같은 고유 기술·방어·집중은 한 라운드에 한 번만 사용할 수 있습니다.";
   seen.add(c.id);
   if(c.directions&&!c.directions.includes(a.direction))return "기술 방향을 선택하세요.";
-  if(c.target&&(!a.target||!inside(a.target.x,a.target.y)||dist(state.fighters[i],a.target)>3))return "함정 설치 위치를 선택하세요.";
+  if(c.target&&(!a.target||!Number.isInteger(a.target.x)||!Number.isInteger(a.target.y)||!options(state,i,c.id).some(v=>v.target.x===a.target.x&&v.target.y===a.target.y)))return "함정 설치 위치를 선택하세요.";
   if(c.id==="raven_ult"&&!hasTrap&& !seen.has("raven_trap"))return "과부하는 먼저 설치된 함정이 있어야 합니다.";
   if(c.id==="raven_trap")hasTrap=true;
   if(c.id==="raven_ult")hasTrap=false;
@@ -137,6 +139,7 @@ export function projectPath(state,side,actions){
  for(const action of actions){
   if(!action)continue;
   const face=enemy.x===me.x?me.facing:(enemy.x>me.x?1:-1),move=targetFor(me,face,action);
+  me.facing=face;
   for(let step=0;step<move.steps;step++){
    if(!move.dx&&!move.dy)break;
    const next={x:me.x+move.dx,y:me.y+move.dy};
@@ -148,7 +151,9 @@ export function projectPath(state,side,actions){
  return {origin:me,path,risks,uncertain:true};
 }
 function performMovement(s,actions,ev,trace){
- const moves=s.fighters.map((me,i)=>targetFor(me,me.facing,actions[i]));
+ // Lock each command's relative direction at the start of this beat. Attack
+ // geometry is recalculated from the positions reached by both commands.
+ const moves=s.fighters.map((me,i)=>targetFor(me,facing(s,i),actions[i]));
  for(let step=0;step<2;step++){
   const old=s.fighters.map(f=>({x:f.x,y:f.y}));
   const wished=s.fighters.map((f,i)=>{
@@ -262,6 +267,7 @@ export function resolveRound(input,queues,{presentation=true}={}){
    const other=s.fighters[1-p.side];
    if(inside(nx,f.y)&&!(nx===other.x&&f.y===other.y)){f.x=nx;ev.push({type:"push",side:p.side,from:{x:nx-p.dir,y:f.y},to:{x:nx,y:f.y},text:"밀려남"});}
   }
+  for(let i=0;i<2;i++)s.fighters[i].facing=facing(s,i);
   if(s.fighters[0].hp===0||s.fighters[1].hp===0){
    s.status="finished";s.winner=s.fighters[0].hp===s.fighters[1].hp?-1:(s.fighters[0].hp>0?0:1);
   }

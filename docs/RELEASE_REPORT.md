@@ -37,9 +37,12 @@
 
 - 저장소: https://github.com/vividhyeok/3beatsdemo
 - 프로덕션: https://3beatsdemo.vercel.app
-- 최종 코드 커밋 SHA: 릴리스 반영 후 기록
-- 원격 푸시 및 GitHub Actions: 릴리스 반영 후 기록
-- Vercel 프로덕션 READY 및 배포 커밋: 릴리스 반영 후 기록
+- 기능 릴리스 커밋 SHA: `5bc2b31694dc02094813b9c2bb6ce54fdb69717b`
+- 원격 푸시: `main` 반영 완료 (PR #1)
+- GitHub Actions: 성공 — run `39128678792`, 26개 테스트·빌드·AI 브라우저·온라인 두 브라우저 검증
+- Vercel 프로덕션: 성공 — deployment `7154753120`, 위 릴리스 커밋과 일치
+- 프로덕션 URL: https://3beatsdemo.vercel.app
+- 실제 응답 확인: `/`, `/src/app.js`, `/src/preload.js`, `/online.html` 모두 HTTP 200 및 `no-cache`; `/api/online/status`는 의도대로 404여서 ONLINE 버튼 비활성
 
 ## 남은 문제
 

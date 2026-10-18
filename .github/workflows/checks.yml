@@ -19,6 +19,8 @@ jobs:
         run: npm run build
       - name: Verify complete browser flow
         run: node tests/browser-smoke.mjs
+      - name: Verify two independent online browsers
+        run: npm run test:online-browser
       - name: Upload screenshot
         if: always()
         uses: actions/upload-artifact@v4

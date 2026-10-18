@@ -59,6 +59,7 @@ try{
   if(!point)throw Error("Cannot click "+selector);
   await call('Input.dispatchMouseEvent',{type:'mouseMoved',...point});await call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});await call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});
  }
+ async function tap(selector){const point=await evaluate(`(()=>{const el=document.querySelector(${JSON.stringify(selector)});if(!el||el.disabled)return null;el.scrollIntoView({block:'center',behavior:'instant'});const r=el.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2};})()`);if(!point)throw Error('Cannot tap '+selector);await call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});await call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
  async function screenshot(name){await evaluate('window.scrollTo(0,0)');fs.mkdirSync("artifacts",{recursive:true});const shot=await call("Page.captureScreenshot",{format:"png",captureBeyondViewport:false});fs.writeFileSync("artifacts/"+name+".png",Buffer.from(shot.data,"base64"));}
  async function loaded(){const bad=await evaluate("Promise.all([...document.querySelectorAll('img[src]')].filter(i=>i.getBoundingClientRect().width>0).map(i=>i.decode().then(()=>null,()=>i.src)))");if(bad.some(Boolean))throw Error("Broken images: "+bad.filter(Boolean));}
  async function layout(width,height,mobile=false){await call("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile});await delay(100);const overflow=await evaluate("document.documentElement.scrollWidth>innerWidth+1");if(overflow)throw Error("Horizontal overflow at "+width+"x"+height);}
@@ -69,7 +70,11 @@ try{
  await click('[data-action="characters"]');await until("!document.querySelector('#select-screen').hidden");await loaded();await screenshot("character-select");await layout(2048,1024);await screenshot('character-select-wide');await layout(1440,1080);
  for(const id of ['jack','eve','raven','zeta']){await click('[data-pick-player="'+id+'"]');if(!await evaluate(`document.querySelector('[data-pick-player="${id}"]').getAttribute('aria-pressed')==='true'`))throw Error('Fighter selection failed');}
  await layout(390,844,true);await loaded();await screenshot('character-select-mobile');await layout(1440,1080);
- await click('[data-pick-player="jack"]');await evaluate("document.querySelector('#difficulty').value='easy';document.querySelector('#difficulty').dispatchEvent(new Event('change'))");await click('[data-action="fight"]');await until("document.querySelector('#phase-label').textContent==='PLANNING'",25000);await loaded();
+ await click('[data-pick-player="jack"]');await evaluate("document.querySelector('#difficulty').value='easy';document.querySelector('#difficulty').dispatchEvent(new Event('change'))");
+ await evaluate("(()=>{window.__OriginalImage=window.Image;const descriptor=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'src');window.Image=function(...args){const image=new window.__OriginalImage(...args);Object.defineProperty(image,'src',{get(){return descriptor.get.call(image)},set(value){if(value.includes('/cards/back.webp'))queueMicrotask(()=>image.onerror?.(new Event('error')));else descriptor.set.call(image,value)}});return image};})()");
+ await click('[data-action="fight"]');await until("!document.querySelector('#load-error').hidden",10000);
+ if(!await evaluate("!document.querySelector('#select-screen').hidden && document.querySelector('#load-error-message').textContent.includes('cards/back')"))throw Error('Loading failure did not offer recovery');
+ await evaluate('window.Image=window.__OriginalImage');await click('#load-error [data-action="fight"]');await until("document.querySelector('#phase-label').textContent==='PLANNING'",25000);await loaded();
  // Every manifest image decodes, including reference-only UI buttons.
  const badAssets=await evaluate("(async()=>{const {ASSETS}=await import('/src/assets.js');return (await Promise.all(Object.values(ASSETS).map(async src=>{try{const i=new Image();i.src=src;await i.decode();return null;}catch{return src;}}))).filter(Boolean)})()");if(badAssets.length)throw Error('Asset failures: '+badAssets);
  const dragWorked=await evaluate("(()=>{const card=document.querySelector('[data-card=forward]'),slot=document.querySelector('[data-remove=\"0\"]'),dataTransfer=new DataTransfer();card.dispatchEvent(new DragEvent('dragstart',{bubbles:true,dataTransfer}));slot.dispatchEvent(new DragEvent('dragover',{bubbles:true,cancelable:true,dataTransfer}));slot.dispatchEvent(new DragEvent('drop',{bubbles:true,cancelable:true,dataTransfer}));return document.querySelector('[data-remove=\"0\"] img')?.getAttribute('src')?.includes('forward')})()");if(!dragWorked)throw Error('Drag to queue failed');
@@ -84,7 +89,7 @@ try{
  if(await evaluate("document.querySelectorAll('#enemy-reveal .open').length")!==1)throw Error('Future beat leaked');
  await click('[data-action="pause"]');const paused=await evaluate("document.querySelector('#battle-stage').dataset.phase");await delay(450);if(await evaluate("document.querySelector('#battle-stage').dataset.phase")!==paused)throw Error('Pause advanced playback');await click('[data-action="resume"]');await click('[data-action="speed"]');await click('[data-action="skip"]');await until("document.querySelector('#round-counter').textContent.includes('ROUND 2') && document.querySelector('#phase-label').textContent==='PLANNING'");
  await loaded();await screenshot('demo-preview');
- for(const size of [[390,844,true],[844,390,true],[768,1024,false],[1440,900,false],[2048,1024,false]]){await layout(...size);await loaded();await screenshot('battle-'+size[0]+'x'+size[1]);}
+ for(const size of [[360,640,true],[390,844,true],[430,932,true],[844,390,true],[768,1024,false],[1024,768,false],[1366,768,false],[1920,1080,false]]){await layout(...size);await loaded();await screenshot('battle-'+size[0]+'x'+size[1]);}
  await layout(1440,1080);
  // Cancel during a running round, then check no stale callback changes a new screen.
  for(const id of ['focus','guard','forward'])await click('[data-card="'+id+'"]');await click('[data-action="execute"]');await until("document.querySelector('#battle-stage').dataset.phase==='REVEAL'");await click('#battle-screen [data-action="menu"]');await delay(500);if(!await evaluate("!document.querySelector('#menu-screen').hidden && document.querySelector('#fx-layer').children.length===0"))throw Error('Stale playback after menu navigation');
@@ -94,6 +99,18 @@ try{
  await click('[data-action="start"]');await click('[data-pick-player="jack"]');await click('[data-action="fight"]');await until("document.querySelector('#phase-label').textContent==='PLANNING' && document.querySelector('#versus-overlay').hidden",25000);
  for(let turn=0;turn<10;turn++){for(const id of ['focus','guard','forward'])await click('[data-card="'+id+'"]');await click('[data-action="execute"]');await click('[data-action="skip"]');await until("!document.querySelector('#result-screen').hidden || (document.querySelector('#phase-label').textContent==='PLANNING' && document.querySelector('#queue-count').textContent==='0/3')");if(await evaluate("!document.querySelector('#result-screen').hidden"))break;}
  if(!await evaluate("!document.querySelector('#result-screen').hidden"))throw Error('AI match did not finish');await loaded();await screenshot('live-match-result');await click('#result-screen [data-action="reset"]');await until("document.querySelector('#phase-label').textContent==='PLANNING' && document.querySelector('#versus-overlay').hidden",25000);if(await evaluate("document.querySelector('#round-counter').textContent")!=='ROUND 1 / 10')throw Error('Rematch failed');
+ // Repeated starts used to saturate mobile image decoders and leave stale callbacks.
+ for(let round=0;round<10;round++){
+  await layout(round%2?360:430,round%2?640:932,true);
+  await click('#battle-screen [data-action="reset"]');
+  if(round%3===0){await click('#battle-screen [data-action="menu"]');await click('[data-action="start"]');await click('[data-action="fight"]');}
+  await until("document.querySelector('#phase-label').textContent==='PLANNING' && document.querySelector('#versus-overlay').hidden",25000);
+  if(await evaluate("document.querySelector('#round-counter').textContent")!=='ROUND 1 / 10')throw Error('Repeated start retained old state');
+  if(round===0){await tap('[data-card="forward"]');await tap('[data-card="jack_jab"]');await tap('[data-move="1,-1"]');if(!await evaluate("document.querySelector('[data-remove=\"0\"] img')?.src.includes('jack/jab')"))throw Error('Touch-accessible reorder failed');}
+ }
+ await layout(1440,1080);
+ const recovery=await evaluate("(async()=>{const {preloadEssential}=await import('/src/preload.js');const signal=new AbortController().signal;let failed=false;try{await preloadEssential(['/missing-image-for-test.webp'],signal,{onDiagnostic:()=>{}})}catch{failed=true}await preloadEssential(['/game_ready/cards/back.webp'],signal);return failed})()");
+ if(!recovery)throw Error('Image failure did not report an error and recover');
  // Production engine + renderer fixtures: exact geometry and deterministic outcomes.
  await call('Page.navigate',{url:pageUrl+'tests/combat-fixture.html'});await until('window.fixtureReady===true');
  for(const name of ['direct','graze','miss','guard','push','move','trap','win','defeat','draw']){
@@ -103,12 +120,15 @@ try{
   const finalHP=await evaluate("document.querySelector('#enemy-stat').textContent");if(!finalHP.startsWith(state.fighters[1].hp+'/'))throw Error('Rendered HP differs from engine');
   if(['win','defeat','draw'].includes(name)){const outcome=await evaluate('window.fixture.result');if(outcome!==({win:0,defeat:1,draw:-1}[name]))throw Error('Wrong result '+name);await loaded();await evaluate("Promise.all(document.querySelector('#result-winner').getAnimations().map(a=>a.finished))");await screenshot('result-'+name);await layout(390,844,true);await screenshot('result-'+name+'-mobile');await layout(1440,1080);}
  }
- if(errors.length)throw Error('Browser errors: '+errors.join(', '));console.log('PASS: menu, keyboard, 4 fighters, all 76 assets, queue removal, secret reveals, pause/2x/skip/cancel, 4 viewport sizes, HIT/GRAZE/MISS/GUARD/push/trap/movement, win/defeat/draw.');
+ if(errors.length)throw Error('Browser errors: '+errors.join(', '));console.log('PASS: asset failure recovery, 10 rematches, menu cancellation, touch reorder, 8 viewports, AI match, 76 assets, beat playback and combat results.');
 }finally{
  try{ws?.close();}catch{}
  try{chrome?.kill("SIGKILL");}catch{}
  await new Promise(resolve=>server.close(resolve));
  if(profile&&path.dirname(path.resolve(profile))===path.resolve(os.tmpdir())&&path.basename(profile).startsWith("three-beats-chrome-")){
-  await delay(250);fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});
+  for(let attempt=0;attempt<20;attempt++){
+   try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:2,retryDelay:100});break;}
+   catch(error){if(!['EPERM','EBUSY','ENOTEMPTY'].includes(error.code))throw error;if(attempt===19)console.warn('Browser profile cleanup deferred:',profile);else await delay(250);}
+  }
  }
 }

@@ -48,5 +48,5 @@ try{
  console.log('PASS: two isolated browsers completed hidden queues, synchronized results, reconnected, rematched and handled departure.');
 }finally{
  for(const ws of sockets)try{ws.close();}catch{}chrome?.kill('SIGKILL');await new Promise(r=>server.close(r));
- if(profile&&path.dirname(path.resolve(profile))===path.resolve(os.tmpdir())&&path.basename(profile).startsWith('three-beats-online-chrome-'))for(let n=0;n<20;n++){try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:2,retryDelay:100});break;}catch(error){if(!['EPERM','EBUSY'].includes(error.code))throw error;if(n===19)console.warn('Browser profile cleanup deferred:',profile);else await delay(250);}}
+ if(profile&&path.dirname(path.resolve(profile))===path.resolve(os.tmpdir())&&path.basename(profile).startsWith('three-beats-online-chrome-'))for(let n=0;n<20;n++){try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:2,retryDelay:100});break;}catch(error){if(!['EPERM','EBUSY','ENOTEMPTY'].includes(error.code))throw error;if(n===19)console.warn('Browser profile cleanup deferred:',profile);else await delay(250);}}
 }

@@ -128,7 +128,7 @@ try{
  if(profile&&path.dirname(path.resolve(profile))===path.resolve(os.tmpdir())&&path.basename(profile).startsWith("three-beats-chrome-")){
   for(let attempt=0;attempt<20;attempt++){
    try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:2,retryDelay:100});break;}
-   catch(error){if(error.code!=='EPERM'&&error.code!=='EBUSY')throw error;if(attempt===19)console.warn('Browser profile cleanup deferred:',profile);else await delay(250);}
+   catch(error){if(!['EPERM','EBUSY','ENOTEMPTY'].includes(error.code))throw error;if(attempt===19)console.warn('Browser profile cleanup deferred:',profile);else await delay(250);}
   }
  }
 }
